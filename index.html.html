@@ -1,0 +1,2735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UPC · Matrícula Inteligente</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #E8001D;
+  --red-dark: #B5001A;
+  --red-light: #FF3350;
+  --red-bg: #FFF0F2;
+  --red-muted: rgba(232,0,29,0.10);
+  --navy: #0A1628;
+  --navy-mid: #1A2A42;
+  --bg: #F0F2F5;
+  --white: #FFFFFF;
+  --gray-50: #F9FAFB;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB;
+  --gray-400: #9CA3AF;
+  --gray-500: #6B7280;
+  --gray-600: #4B5563;
+  --gray-800: #1F2937;
+  --green: #10B981;
+  --green-bg: #ECFDF5;
+  --orange: #F59E0B;
+  --orange-bg: #FFFBEB;
+  --blue: #3B82F6;
+  --blue-bg: #EFF6FF;
+  --purple: #8B5CF6;
+  --purple-bg: #F5F3FF;
+  --shadow-xs: 0 1px 3px rgba(0,0,0,0.07);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.10);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.14);
+  --shadow-red: 0 6px 20px rgba(232,0,29,0.30);
+  --r: 14px;
+  --r-sm: 10px;
+  --r-xs: 7px;
+  --sidebar-w: 240px;
+  --topbar-h: 60px;
+  --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:15px;scroll-behavior:smooth;}
+body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--bg);min-height:100vh;color:var(--gray-800);line-height:1.5;}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;}
+input,select,textarea{font-family:inherit;outline:none;}
+a{text-decoration:none;color:inherit;}
+
+/* ── LAYOUT ── */
+.app-shell{display:flex;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar-w);
+  background:var(--navy);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;
+  z-index:200;
+  transition:transform var(--transition);
+  overflow:hidden;
+}
+.sidebar-logo{
+  padding:20px 18px 16px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.logo-mark{
+  width:36px;height:36px;flex-shrink:0;
+  background:var(--red);border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Sora',sans-serif;font-weight:900;font-size:13px;color:white;
+  letter-spacing:-0.5px;
+}
+.logo-text{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;color:white;letter-spacing:-0.3px;line-height:1.2;}
+.logo-text span{color:rgba(255,255,255,0.45);font-weight:400;font-size:11px;display:block;}
+
+.sidebar-user{
+  padding:16px 18px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.user-ava{
+  width:34px;height:34px;flex-shrink:0;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--red-light),var(--red-dark));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:12px;color:white;
+}
+.user-info .name{font-size:12px;font-weight:600;color:white;line-height:1.2;}
+.user-info .code{font-size:10px;color:rgba(255,255,255,0.4);}
+
+.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;}
+.nav-section-label{
+  font-size:9px;text-transform:uppercase;letter-spacing:.12em;
+  color:rgba(255,255,255,0.25);font-weight:600;
+  padding:10px 10px 6px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:8px;
+  font-size:12.5px;font-weight:500;color:rgba(255,255,255,0.55);
+  cursor:pointer;transition:all var(--transition);
+  margin-bottom:1px;
+  border:none;background:none;width:100%;text-align:left;
+}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85);}
+.nav-item.active{background:rgba(232,0,29,0.18);color:white;}
+.nav-item.active .nav-icon{color:var(--red-light);}
+.nav-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0;}
+.nav-badge{
+  margin-left:auto;
+  background:var(--red);color:white;
+  font-size:9px;font-weight:700;
+  padding:1px 5px;border-radius:20px;min-width:16px;text-align:center;
+}
+
+.sidebar-footer{
+  padding:14px 18px;
+  border-top:1px solid rgba(255,255,255,0.07);
+}
+.semester-badge{
+  background:rgba(255,255,255,0.06);
+  border-radius:8px;padding:10px 12px;
+}
+.semester-badge .sem{font-size:10px;color:rgba(255,255,255,0.4);}
+.semester-badge .val{font-size:12px;font-weight:600;color:white;}
+
+/* ── MAIN ── */
+.main-area{
+  margin-left:var(--sidebar-w);
+  flex:1;display:flex;flex-direction:column;min-height:100vh;
+  padding-top:0;
+}
+
+
+/* ── PANELS ── */
+.panel{display:none;flex:1;padding:28px;animation:fadeUp 0.3s ease;}
+.panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PANEL: WIZARD ── */
+.wizard-wrap{
+  max-width:820px;margin:0 auto;
+}
+.wizard-hero{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%);
+  border-radius:var(--r);padding:32px 36px;
+  margin-bottom:24px;position:relative;overflow:hidden;
+}
+.wizard-hero::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:240px;height:240px;border-radius:50%;
+  background:rgba(232,0,29,0.12);
+}
+.wizard-hero::after{
+  content:'';position:absolute;bottom:-40px;left:60px;
+  width:140px;height:140px;border-radius:50%;
+  background:rgba(255,255,255,0.04);
+}
+.wizard-hero-title{
+  font-family:'Sora',sans-serif;font-size:26px;font-weight:800;
+  color:white;line-height:1.2;margin-bottom:6px;position:relative;z-index:2;
+}
+.wizard-hero-title .accent{color:var(--red-light);}
+.wizard-hero-sub{font-size:13px;color:rgba(255,255,255,0.55);position:relative;z-index:2;}
+.wizard-steps-indicator{
+  display:flex;align-items:center;gap:0;
+  position:relative;z-index:2;margin-top:24px;
+}
+.ws-step{
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);
+}
+.ws-step.active{color:white;}
+.ws-step.done{color:rgba(255,255,255,0.55);}
+.ws-dot{
+  width:22px;height:22px;border-radius:50%;
+  border:2px solid rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;transition:all var(--transition);
+}
+.ws-step.active .ws-dot{border-color:var(--red-light);background:var(--red);color:white;}
+.ws-step.done .ws-dot{border-color:var(--green);background:var(--green);color:white;}
+.ws-line{width:28px;height:2px;background:rgba(255,255,255,0.12);margin:0 4px;flex-shrink:0;}
+.ws-line.done{background:var(--green);}
+
+/* WIZARD CARDS */
+.wizard-card{
+  background:var(--white);border-radius:var(--r);
+  box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.wizard-step{display:none;padding:28px 32px;}
+.wizard-step.active{display:block;}
+.step-title{font-family:'Sora',sans-serif;font-size:17px;font-weight:700;margin-bottom:4px;}
+.step-sub{font-size:12.5px;color:var(--gray-500);margin-bottom:22px;}
+
+/* Course picker */
+.courses-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  margin-bottom:20px;
+}
+.course-tile{
+  border:2px solid var(--gray-200);border-radius:var(--r-sm);
+  padding:14px 14px;cursor:pointer;transition:all var(--transition);
+  display:flex;align-items:flex-start;gap:10px;
+  background:var(--white);
+}
+.course-tile:hover{border-color:var(--red);background:var(--red-bg);}
+.course-tile.selected{border-color:var(--red);background:var(--red-bg);}
+.ct-icon{font-size:22px;flex-shrink:0;margin-top:1px;}
+.ct-info .ct-name{font-size:12.5px;font-weight:600;line-height:1.3;}
+.ct-info .ct-credits{font-size:10.5px;color:var(--gray-500);margin-top:2px;}
+.ct-check{
+  width:18px;height:18px;border-radius:50%;border:2px solid var(--gray-300);
+  margin-left:auto;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;color:white;transition:all var(--transition);
+}
+.course-tile.selected .ct-check{background:var(--red);border-color:var(--red);}
+
+/* Turno picker */
+.turno-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.turno-card{
+  border:2px solid var(--gray-200);border-radius:var(--r-sm);
+  padding:20px 16px;text-align:center;cursor:pointer;
+  transition:all var(--transition);background:var(--white);
+}
+.turno-card:hover{border-color:var(--red);transform:translateY(-2px);}
+.turno-card.selected{border-color:var(--red);background:var(--red-bg);}
+.tc-icon{font-size:28px;margin-bottom:8px;}
+.tc-label{font-size:13px;font-weight:700;margin-bottom:2px;}
+.tc-range{font-size:11px;color:var(--gray-500);}
+.tc-blocks{margin-top:8px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;}
+.tc-block{
+  background:var(--gray-100);border-radius:4px;
+  font-size:9px;font-weight:600;color:var(--gray-500);
+  padding:2px 5px;
+}
+.turno-card.selected .tc-block{background:rgba(232,0,29,0.12);color:var(--red);}
+
+/* Free days */
+.days-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.day-chip{
+  padding:8px 16px;border-radius:20px;
+  border:2px solid var(--gray-200);background:var(--white);
+  font-size:12.5px;font-weight:600;cursor:pointer;transition:all var(--transition);
+}
+.day-chip:hover{border-color:var(--red);}
+.day-chip.selected{border-color:var(--red);background:var(--red-bg);color:var(--red);}
+
+/* Preferences toggles */
+.pref-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.pref-item{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--gray-50);border-radius:var(--r-sm);
+  padding:14px 16px;
+}
+.pref-label{font-size:13px;font-weight:500;}
+.pref-sub{font-size:11px;color:var(--gray-500);margin-top:1px;}
+.toggle{
+  width:44px;height:24px;border-radius:12px;
+  background:var(--gray-300);border:none;cursor:pointer;
+  position:relative;transition:background var(--transition);flex-shrink:0;
+}
+.toggle.on{background:var(--red);}
+.toggle::after{
+  content:'';position:absolute;top:3px;left:3px;
+  width:18px;height:18px;border-radius:50%;background:white;
+  transition:transform var(--transition);box-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle.on::after{transform:translateX(20px);}
+
+/* Load picker */
+.load-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.load-card{
+  border:2px solid var(--gray-200);border-radius:var(--r-sm);
+  padding:16px;cursor:pointer;transition:all var(--transition);text-align:center;background:var(--white);
+}
+.load-card:hover{border-color:var(--blue);}
+.load-card.selected{border-color:var(--blue);background:var(--blue-bg);}
+.lc-icon{font-size:24px;margin-bottom:6px;}
+.lc-label{font-size:13px;font-weight:700;}
+.lc-sub{font-size:11px;color:var(--gray-500);margin-top:2px;}
+
+/* Buttons */
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
+.btn{
+  padding:11px 22px;border-radius:var(--r-xs);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all var(--transition);border:none;
+}
+.btn-primary{background:var(--red);color:white;box-shadow:var(--shadow-red);}
+.btn-primary:hover{background:var(--red-dark);transform:translateY(-1px);}
+.btn-secondary{background:var(--gray-100);color:var(--gray-700);}
+.btn-secondary:hover{background:var(--gray-200);}
+.btn-outline{background:transparent;color:var(--red);border:2px solid var(--red);}
+.btn-outline:hover{background:var(--red-bg);}
+
+/* ── GENERATING SCREEN ── */
+.generating-wrap{
+  max-width:500px;margin:0 auto;
+  display:flex;flex-direction:column;align-items:center;
+  padding:48px 32px;text-align:center;
+}
+.gen-icon{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--red-bg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;margin-bottom:24px;
+  animation:pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.gen-title{font-family:'Sora',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px;}
+.gen-sub{font-size:13px;color:var(--gray-500);margin-bottom:28px;}
+.gen-steps{width:100%;display:flex;flex-direction:column;gap:8px;}
+.gen-step{
+  display:flex;align-items:center;gap:12px;
+  background:var(--white);border-radius:var(--r-sm);
+  padding:12px 16px;text-align:left;
+  font-size:12.5px;font-weight:500;color:var(--gray-600);
+  border:1px solid var(--gray-200);transition:all 0.4s;
+}
+.gen-step.active{border-color:var(--orange);color:var(--gray-800);}
+.gen-step.done{border-color:var(--green);color:var(--green);}
+.gen-step-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.gen-bar{width:100%;height:4px;background:var(--gray-200);border-radius:2px;margin-top:20px;}
+.gen-bar-fill{height:100%;background:var(--red);border-radius:2px;width:0;transition:width 0.4s ease;}
+
+/* ── PANEL: SCHEDULE ── */
+.schedule-wrap{max-width:1100px;}
+.schedule-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;}
+.schedule-title-area .page-title{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;margin-bottom:2px;}
+.schedule-title-area .page-sub{font-size:12.5px;color:var(--gray-500);}
+.score-badge{
+  display:flex;align-items:center;gap:10px;
+  background:var(--white);border-radius:var(--r-sm);
+  padding:12px 18px;box-shadow:var(--shadow-sm);
+}
+.score-circle{
+  width:48px;height:48px;border-radius:50%;flex-shrink:0;
+  background:conic-gradient(var(--green) 0deg, var(--gray-200) 0deg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:var(--navy);
+}
+.score-info .score-val{font-size:20px;font-weight:800;color:var(--green);}
+.score-info .score-label{font-size:10.5px;color:var(--gray-500);}
+
+.schedule-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;}
+
+/* Weekly grid */
+.week-grid{
+  background:var(--white);border-radius:var(--r);
+  box-shadow:var(--shadow-sm);overflow:hidden;
+}
+.week-grid-head{
+  display:grid;grid-template-columns:80px repeat(5,1fr);
+  background:var(--gray-50);
+  border-bottom:1px solid var(--gray-200);
+}
+.wg-day-header{
+  padding:12px 10px;text-align:center;
+  font-size:11px;font-weight:700;color:var(--gray-600);
+  text-transform:uppercase;letter-spacing:.06em;
+}
+.wg-day-header.today{color:var(--red);}
+.week-grid-body{
+  display:grid;grid-template-columns:80px repeat(5,1fr);
+}
+.wg-time-col{
+  border-right:1px solid var(--gray-100);
+}
+.wg-time-cell{
+  height:54px;
+  display:flex;align-items:center;justify-content:flex-end;
+  padding-right:10px;
+  font-size:10px;color:var(--gray-400);font-weight:600;
+  border-bottom:1px solid var(--gray-100);
+}
+.wg-day-col{
+  border-right:1px solid var(--gray-100);
+  position:relative;
+  min-height:486px;
+}
+.wg-day-col:last-child{border-right:none;}
+.wg-cell{
+  height:54px;border-bottom:1px solid var(--gray-100);
+  position:relative;
+}
+.course-block{
+  position:absolute;left:4px;right:4px;
+  border-radius:7px;
+  padding:6px 8px;
+  cursor:pointer;
+  transition:all var(--transition);
+  overflow:hidden;
+  z-index:2;
+}
+.course-block:hover{transform:scale(1.02);box-shadow:var(--shadow-md);z-index:5;}
+.cb-name{font-size:11px;font-weight:700;line-height:1.2;}
+.cb-time{font-size:9.5px;opacity:0.75;margin-top:2px;}
+.cb-prof{font-size:9.5px;opacity:0.65;margin-top:1px;}
+
+/* color palette for courses */
+.color-0{background:#DBEAFE;color:#1E40AF;border-left:3px solid #3B82F6;}
+.color-1{background:#FCE7F3;color:#9D174D;border-left:3px solid #EC4899;}
+.color-2{background:#D1FAE5;color:#065F46;border-left:3px solid #10B981;}
+.color-3{background:#FEF3C7;color:#92400E;border-left:3px solid #F59E0B;}
+.color-4{background:#EDE9FE;color:#5B21B6;border-left:3px solid #8B5CF6;}
+.color-5{background:#FFEDD5;color:#9A3412;border-left:3px solid #F97316;}
+
+/* Right panel */
+.schedule-sidebar{display:flex;flex-direction:column;gap:14px;}
+.sched-card{
+  background:var(--white);border-radius:var(--r);
+  padding:18px;box-shadow:var(--shadow-sm);
+}
+.sched-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-500);margin-bottom:12px;}
+.explanation-text{font-size:12.5px;color:var(--gray-600);line-height:1.65;}
+.explanation-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--gray-100);border-radius:20px;
+  padding:3px 8px;font-size:10.5px;font-weight:600;
+  margin:2px 2px 0 0;
+}
+.course-summary-item{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 0;border-bottom:1px solid var(--gray-100);
+  cursor:pointer;transition:background var(--transition);
+  border-radius:6px;padding:8px;
+}
+.course-summary-item:hover{background:var(--gray-50);}
+.course-summary-item:last-child{border-bottom:none;}
+.cs-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.cs-info .cs-name{font-size:12px;font-weight:600;}
+.cs-info .cs-slot{font-size:10.5px;color:var(--gray-500);}
+.cs-arrow{margin-left:auto;color:var(--gray-400);font-size:12px;}
+
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.stat-mini{
+  background:var(--gray-50);border-radius:var(--r-xs);
+  padding:12px;text-align:center;
+}
+.stat-mini .val{font-size:18px;font-weight:800;color:var(--navy);}
+.stat-mini .lbl{font-size:10px;color:var(--gray-500);margin-top:2px;}
+
+/* ── PANEL: PROFESSORS ── */
+.prof-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;
+}
+.prof-card{
+  background:var(--white);border-radius:var(--r);
+  padding:20px;box-shadow:var(--shadow-sm);
+  transition:all var(--transition);cursor:pointer;
+  border:1px solid var(--gray-100);
+}
+.prof-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+.prof-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
+.prof-ava{
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:14px;color:white;
+}
+.prof-info .prof-name{font-size:13.5px;font-weight:700;}
+.prof-info .prof-course{font-size:11px;color:var(--gray-500);margin-top:1px;}
+.stars{display:flex;gap:2px;align-items:center;margin-top:4px;}
+.star{font-size:11px;}
+.star.filled{color:#F59E0B;}
+.star.empty{color:var(--gray-300);}
+.rating-num{font-size:11px;font-weight:700;color:var(--gray-700);margin-left:4px;}
+.prof-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
+.prof-tag{
+  background:var(--gray-100);border-radius:20px;
+  padding:3px 9px;font-size:10px;font-weight:600;color:var(--gray-600);
+}
+.prof-tag.best{background:var(--orange-bg);color:var(--orange);}
+.prof-tag.new{background:var(--blue-bg);color:var(--blue);}
+.prof-tag.strict{background:#FEF2F2;color:#DC2626;}
+.prof-stat{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;color:var(--gray-500);
+  border-top:1px solid var(--gray-100);padding-top:10px;margin-top:4px;
+}
+
+/* ── PANEL: PROGRESS ── */
+.progress-wrap{max-width:900px;}
+.prog-hero{
+  background:linear-gradient(135deg,var(--navy) 0%,#1E3A5F 100%);
+  border-radius:var(--r);padding:28px 32px;
+  margin-bottom:20px;color:white;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.prog-hero-text h2{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px;}
+.prog-hero-text p{font-size:12.5px;color:rgba(255,255,255,0.55);}
+.prog-circle{
+  width:80px;height:80px;flex-shrink:0;
+}
+.prog-circle svg{transform:rotate(-90deg);}
+.prog-circle-num{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-size:16px;font-weight:800;
+}
+.prog-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
+.prog-stat-card{
+  background:var(--white);border-radius:var(--r);
+  padding:18px;box-shadow:var(--shadow-sm);
+}
+.prog-stat-card .label{font-size:11px;color:var(--gray-500);margin-bottom:6px;}
+.prog-stat-card .value{font-size:22px;font-weight:800;color:var(--navy);}
+.prog-stat-card .sub{font-size:10.5px;color:var(--gray-500);margin-top:2px;}
+.progress-bar-outer{
+  background:var(--gray-100);border-radius:20px;height:8px;
+  overflow:hidden;margin-top:8px;
+}
+.progress-bar-inner{
+  height:100%;background:var(--red);border-radius:20px;
+  transition:width 1s ease;
+}
+.ciclos-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.ciclo-card{
+  background:var(--white);border-radius:var(--r-sm);
+  padding:12px;text-align:center;box-shadow:var(--shadow-xs);
+  border:1px solid var(--gray-100);
+}
+.ciclo-card.done{border-color:var(--green);}
+.ciclo-card .ciclo-num{font-size:10px;color:var(--gray-400);font-weight:600;margin-bottom:4px;}
+.ciclo-card .ciclo-label{font-size:12px;font-weight:700;}
+.ciclo-card.done .ciclo-label{color:var(--green);}
+.ciclo-card.current .ciclo-label{color:var(--red);}
+.ciclo-dot{width:8px;height:8px;border-radius:50%;background:var(--gray-300);margin:6px auto 0;}
+.ciclo-card.done .ciclo-dot{background:var(--green);}
+.ciclo-card.current .ciclo-dot{background:var(--red);}
+
+/* ── PANEL: WAITLIST ── */
+.waitlist-wrap{max-width:700px;}
+.wl-header{
+  background:var(--white);border-radius:var(--r);
+  padding:22px;box-shadow:var(--shadow-sm);margin-bottom:16px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.wl-pos{font-size:42px;font-weight:900;font-family:'Sora',sans-serif;color:var(--red);}
+.wl-pos-sub{font-size:12px;color:var(--gray-500);margin-top:2px;}
+.wl-queue{display:flex;gap:6px;align-items:center;}
+.wl-person{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;border:2px solid var(--white);
+  background:var(--gray-200);transition:all 0.4s;
+}
+.wl-person.you{background:var(--red);font-size:11px;font-weight:700;color:white;border-color:var(--red);}
+.wl-person.gone{opacity:0.2;transform:scale(0.8);}
+.wl-courses{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.wl-item{
+  background:var(--white);border-radius:var(--r);
+  padding:16px 20px;box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;gap:14px;
+}
+.wl-icon{font-size:20px;flex-shrink:0;}
+.wl-info .wl-name{font-size:13px;font-weight:700;}
+.wl-info .wl-sub{font-size:11px;color:var(--gray-500);}
+.wl-chip{
+  margin-left:auto;padding:4px 10px;border-radius:20px;
+  font-size:10.5px;font-weight:700;
+  background:var(--orange-bg);color:var(--orange);flex-shrink:0;
+}
+.wl-chip.green{background:var(--green-bg);color:var(--green);}
+.wl-advance-btn{
+  background:var(--red);color:white;
+  padding:13px 22px;border-radius:var(--r-sm);
+  font-size:13px;font-weight:700;cursor:pointer;
+  border:none;transition:all var(--transition);
+  box-shadow:var(--shadow-red);
+}
+.wl-advance-btn:hover{background:var(--red-dark);}
+.demand-section{
+  background:var(--white);border-radius:var(--r);
+  padding:20px;box-shadow:var(--shadow-sm);margin-bottom:16px;
+}
+.demand-bar-outer{height:10px;background:var(--gray-100);border-radius:20px;overflow:hidden;margin:10px 0;}
+.demand-bar-inner{height:100%;background:linear-gradient(90deg,var(--orange),var(--red));border-radius:20px;transition:width 1s ease;}
+
+/* ── PANEL: ALERTS ── */
+.alerts-list{display:flex;flex-direction:column;gap:10px;max-width:700px;}
+.alert-item{
+  background:var(--white);border-radius:var(--r);
+  padding:16px 20px;box-shadow:var(--shadow-sm);
+  display:flex;align-items:flex-start;gap:14px;
+  border-left:4px solid var(--gray-200);
+  transition:all var(--transition);
+}
+.alert-item.unread{border-left-color:var(--red);}
+.alert-item.success{border-left-color:var(--green);}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.alert-body .alert-title{font-size:13px;font-weight:700;margin-bottom:2px;}
+.alert-body .alert-sub{font-size:11.5px;color:var(--gray-500);}
+.alert-time{margin-left:auto;font-size:10.5px;color:var(--gray-400);flex-shrink:0;}
+.unread-dot{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:5px;}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(10,22,40,0.55);
+  z-index:500;display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(3px);
+  animation:fadeIn 0.2s ease;
+}
+.modal-overlay.open{display:flex;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{
+  background:var(--white);border-radius:18px;
+  width:560px;max-width:95vw;
+  box-shadow:var(--shadow-lg);
+  animation:slideUp 0.25s ease;
+  overflow:hidden;max-height:85vh;overflow-y:auto;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{
+  padding:20px 24px;
+  border-bottom:1px solid var(--gray-200);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-title{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;}
+.modal-close{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--gray-100);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:all var(--transition);
+}
+.modal-close:hover{background:var(--gray-200);}
+.modal-body{padding:20px 24px;}
+.alt-section-item{
+  border:2px solid var(--gray-200);border-radius:var(--r-sm);
+  padding:14px;margin-bottom:10px;cursor:pointer;transition:all var(--transition);
+}
+.alt-section-item:hover{border-color:var(--red);background:var(--red-bg);}
+.alt-section-item.selected{border-color:var(--red);}
+.alt-s-name{font-size:12.5px;font-weight:700;}
+.alt-s-detail{font-size:11px;color:var(--gray-500);margin-top:3px;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:28px;right:28px;
+  background:var(--navy);color:white;
+  padding:13px 20px;border-radius:var(--r-sm);
+  font-size:13px;font-weight:600;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:var(--shadow-lg);
+  transform:translateY(80px);opacity:0;
+  transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
+  z-index:1000;
+  max-width:340px;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* ── ERROR CARD ── */
+.error-card{
+  background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r);
+  padding:20px 24px;margin-bottom:20px;
+  display:none;
+}
+.error-card.show{display:block;}
+.error-card .err-title{font-size:14px;font-weight:700;color:#B91C1C;margin-bottom:4px;}
+.error-card .err-sub{font-size:12.5px;color:#DC2626;}
+
+/* ── SECTION: new request ── */
+.req-form{
+  background:var(--white);border-radius:var(--r);
+  padding:22px;box-shadow:var(--shadow-sm);
+}
+.form-row{margin-bottom:14px;}
+.form-label{font-size:11.5px;font-weight:700;color:var(--gray-600);margin-bottom:5px;display:block;}
+.form-input{
+  width:100%;padding:10px 12px;border-radius:var(--r-xs);
+  border:1.5px solid var(--gray-200);background:var(--gray-50);
+  font-size:13px;transition:all var(--transition);
+}
+.form-input:focus{border-color:var(--red);background:white;}
+.form-select{
+  width:100%;padding:10px 12px;border-radius:var(--r-xs);
+  border:1.5px solid var(--gray-200);background:var(--gray-50);
+  font-size:13px;
+}
+
+/* page header */
+.page-header{margin-bottom:24px;}
+.page-header .page-title{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;margin-bottom:2px;}
+.page-header .page-sub{font-size:12.5px;color:var(--gray-500);}
+.page-header-row{display:flex;justify-content:space-between;align-items:flex-end;}
+
+/* ── EMPTY SCHEDULE WARNING ── */
+.empty-schedule{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:320px;color:var(--gray-400);
+  font-size:14px;gap:12px;
+}
+.empty-schedule .empty-icon{font-size:40px;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:10px;}
+
+/* ── REGENERATE BUTTON STRIP ── */
+.regen-strip{
+  background:var(--orange-bg);border:1px solid #FDE68A;border-radius:var(--r-sm);
+  padding:12px 16px;display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.regen-strip .regen-text{font-size:12.5px;font-weight:600;color:#92400E;}
+
+/* ═══ MOBILE HAMBURGER ═══ */
+.mob-topbar{display:none;position:fixed;top:0;left:0;right:0;height:52px;z-index:300;
+  background:var(--navy);align-items:center;padding:0 14px;gap:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.mob-menu-btn{width:36px;height:36px;background:rgba(255,255,255,.1);border:none;border-radius:8px;
+  color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mob-title{font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:white;}
+.mob-title span{color:var(--red-light);}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:198;backdrop-filter:blur(2px);}
+.sidebar-overlay.visible{display:block;}
+
+/* ═══ CREDIT LIMIT MODAL ═══ */
+.credit-modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,.6);z-index:600;
+  display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+.credit-modal-overlay.open{display:flex;}
+.credit-modal-box{background:white;border-radius:18px;width:480px;max-width:94vw;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);animation:slideUp .25s ease;overflow:hidden;}
+.credit-modal-header{background:linear-gradient(135deg,#FEF2F2,#FFF5F5);
+  padding:22px 24px 16px;border-bottom:1px solid #FECACA;}
+.credit-modal-title{font-family:'Sora',sans-serif;font-size:16px;font-weight:800;
+  color:#B91C1C;margin-bottom:4px;}
+.credit-modal-sub{font-size:12px;color:#DC2626;line-height:1.5;}
+.credit-modal-body{padding:20px 24px;max-height:300px;overflow-y:auto;}
+.credit-swap-item{display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border:2px solid var(--gray-200);border-radius:var(--r-sm);cursor:pointer;
+  transition:all var(--transition);background:white;margin-bottom:8px;}
+.credit-swap-item:hover{border-color:var(--red);background:var(--red-bg);}
+.credit-swap-item.marked{border-color:var(--red);background:var(--red-bg);}
+.csw-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--gray-300);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:white;transition:all var(--transition);}
+.credit-swap-item.marked .csw-check{background:var(--red);border-color:var(--red);}
+.csw-info{flex:1;}
+.csw-name{font-size:12.5px;font-weight:600;}
+.csw-credits{font-size:11px;color:var(--gray-500);}
+.credit-modal-footer{padding:14px 24px;border-top:1px solid var(--gray-100);
+  display:flex;gap:10px;justify-content:flex-end;}
+
+/* ═══ ADD COURSE MODAL ═══ */
+.add-course-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  max-height:340px;overflow-y:auto;padding-bottom:4px;}
+.add-tile{border:2px solid var(--gray-200);border-radius:var(--r-sm);
+  padding:12px;cursor:pointer;display:flex;align-items:center;gap:8px;
+  background:white;transition:all var(--transition);}
+.add-tile:hover:not(.add-tile-disabled){border-color:var(--red);background:var(--red-bg);}
+.add-tile-disabled{opacity:.4;cursor:not-allowed;}
+.add-tile-name{font-size:11.5px;font-weight:600;line-height:1.3;}
+.add-tile-cr{font-size:10px;color:var(--gray-500);}
+
+/* ═══ GAP HOURS INPUT ═══ */
+.gap-sub-panel{display:none;margin-top:10px;padding:14px 16px;
+  background:var(--purple-bg);border:1.5px solid #DDD6FE;border-radius:var(--r-sm);}
+.gap-sub-panel.visible{display:flex;align-items:center;gap:14px;}
+.gap-label{font-size:12.5px;font-weight:600;color:#5B21B6;flex:1;}
+.gap-stepper{display:flex;align-items:center;gap:10px;}
+.gap-btn{width:32px;height:32px;border-radius:50%;background:var(--purple);
+  color:white;font-size:18px;font-weight:700;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all var(--transition);}
+.gap-btn:hover{background:#7C3AED;}
+.gap-val{font-size:20px;font-weight:900;color:#5B21B6;min-width:24px;text-align:center;
+  font-family:'Sora',sans-serif;}
+.gap-unit{font-size:11px;color:#7C3AED;}
+
+/* ═══ COURSERA MULTI-TILES ═══ */
+.coursera-tile{border:2px solid var(--gray-200);border-radius:var(--r-sm);
+  padding:14px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:12px;
+  background:white;transition:all var(--transition);position:relative;}
+.coursera-tile:hover{border-color:var(--purple);background:var(--purple-bg);}
+.coursera-tile.selected{border-color:var(--purple);background:var(--purple-bg);}
+.ct-virtual-badge{position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:700;
+  padding:2px 7px;border-radius:20px;background:var(--purple);color:white;}
+.coursera-tile .ct-check{border-color:var(--gray-300);}
+.coursera-tile.selected .ct-check{background:var(--purple);border-color:var(--purple);}
+.coursera-multi-total{font-size:12px;font-weight:700;color:#5B21B6;
+  margin-top:10px;padding:8px 12px;background:var(--purple-bg);
+  border-radius:var(--r-xs);display:none;}
+.coursera-multi-total.visible{display:block;}
+
+/* ═══ SCHEDULE EDIT BAR ═══ */
+.sched-edit-bar{display:none;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:12px 16px;background:var(--blue-bg);border:1px solid #BFDBFE;
+  border-radius:var(--r-sm);margin-bottom:14px;}
+.sched-edit-bar.visible{display:flex;}
+.sched-edit-title{font-size:12px;font-weight:700;color:#1D4ED8;flex:1;}
+.sched-credit-pill{font-size:11.5px;font-weight:700;padding:4px 12px;
+  border-radius:20px;background:white;border:1px solid #BFDBFE;color:#1D4ED8;}
+.sched-credit-pill.warn{background:var(--orange-bg);border-color:#FDE68A;color:var(--orange);}
+.sched-credit-pill.full{background:var(--red-bg);border-color:#FECACA;color:var(--red);}
+.sched-add-btn{background:#1D4ED8;color:white;padding:8px 14px;border-radius:var(--r-xs);
+  font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all var(--transition);}
+.sched-add-btn:hover{background:#1e40af;}
+
+/* ═══ FULL-DAY GRID ═══ */
+.week-grid-full{background:var(--white);border-radius:var(--r);
+  box-shadow:var(--shadow-sm);overflow:auto;}
+.wg-full-head{display:flex;background:var(--gray-50);border-bottom:1px solid var(--gray-200);
+  position:sticky;top:0;z-index:10;min-width:600px;}
+.wg-full-time-header{width:66px;flex-shrink:0;padding:10px 6px;text-align:center;
+  font-size:10px;color:var(--gray-400);font-weight:600;border-right:1px solid var(--gray-200);}
+.wg-full-day-header{flex:1;padding:10px 6px;text-align:center;font-size:11px;
+  font-weight:700;color:var(--gray-600);text-transform:uppercase;
+  letter-spacing:.05em;border-left:1px solid var(--gray-100);min-width:80px;}
+.wg-full-day-header.sunday-header{background:rgba(139,92,246,.08);color:var(--purple);}
+.wg-full-body{display:flex;min-width:600px;position:relative;}
+.wg-full-time-col{width:66px;flex-shrink:0;border-right:1px solid var(--gray-100);}
+.wg-full-time-cell{height:44px;display:flex;align-items:center;justify-content:flex-end;
+  padding-right:8px;font-size:9.5px;color:var(--gray-300);font-weight:600;
+  border-bottom:1px solid var(--gray-100);}
+.wg-full-time-cell.in-turno{color:var(--gray-500);}
+.wg-full-day-col{flex:1;border-right:1px solid var(--gray-100);position:relative;min-width:80px;}
+.wg-full-day-col:last-child{border-right:none;}
+.wg-full-day-col.sunday-col{background:rgba(139,92,246,.025);}
+.wg-full-cell{height:44px;border-bottom:1px solid var(--gray-100);}
+.wg-full-cell.in-turno{background:rgba(255,255,255,.7);}
+.wg-full-cell.gap-slot{background:rgba(139,92,246,.05);}
+.course-block-full{position:absolute;left:3px;right:3px;border-radius:7px;
+  padding:5px 7px;cursor:pointer;overflow:hidden;z-index:3;
+  transition:all var(--transition);}
+.course-block-full:hover{transform:translateX(1px);box-shadow:var(--shadow-md);z-index:6;}
+.cb-remove-btn{position:absolute;top:3px;right:3px;width:16px;height:16px;
+  background:rgba(0,0,0,.2);border:none;border-radius:50%;color:white;
+  font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;
+  z-index:7;line-height:1;}
+.course-block-full:hover .cb-remove-btn{display:flex;}
+.cb-fn{font-size:10px;font-weight:700;line-height:1.2;padding-right:18px;}
+.cb-ft{font-size:8.5px;opacity:.75;margin-top:1px;}
+.cb-fp{font-size:8.5px;opacity:.6;margin-top:1px;}
+.cb-tag{font-size:7.5px;font-weight:700;padding:1px 4px;border-radius:3px;
+  margin-top:2px;display:inline-block;}
+.cb-tag-virtual{background:rgba(139,92,246,.25);color:#6D28D9;}
+.sunday-note{font-size:11.5px;color:var(--purple);background:var(--purple-bg);
+  border:1px solid #DDD6FE;border-radius:var(--r-xs);padding:8px 12px;
+  margin-bottom:10px;display:none;}
+.sunday-note.visible{display:block;}
+
+/* ═══ TURNO multi-select tweak ═══ */
+.turno-card.selected{border-color:var(--red);background:var(--red-bg);}
+
+/* ═══ MOBILE RESPONSIVE ═══ */
+@media (max-width:768px){
+  .mob-topbar{display:flex;}
+  .sidebar{transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);}
+  .sidebar.open{transform:translateX(0);}
+  .main-area{margin-left:0!important;padding-top:52px;}
+  .panel{padding:14px;}
+  .wizard-wrap{max-width:100%;}
+  .wizard-hero{padding:18px 16px;}
+  .wizard-hero-title{font-size:20px;}
+  .wizard-steps-indicator{flex-wrap:wrap;gap:3px;}
+  .ws-line{width:10px;}
+  .ws-step{font-size:9px;gap:4px;}
+  .ws-dot{width:18px;height:18px;font-size:8px;}
+  .wizard-step{padding:18px 14px;}
+  .courses-grid{grid-template-columns:1fr 1fr!important;}
+  .turno-grid{grid-template-columns:1fr!important;}
+  .load-grid{grid-template-columns:1fr!important;}
+  .elec-type-row{flex-direction:column!important;}
+  .schedule-layout{grid-template-columns:1fr!important;}
+  .schedule-header{flex-direction:column;gap:12px;}
+  .schedule-header>div:last-child{flex-wrap:wrap;gap:8px;}
+  .prog-stats{grid-template-columns:1fr 1fr!important;}
+  .ciclos-grid{grid-template-columns:repeat(3,1fr)!important;}
+  .wl-header{flex-direction:column;gap:14px;}
+  .add-course-grid{grid-template-columns:1fr!important;}
+  .btn-row{flex-wrap:wrap;gap:8px;}
+  .week-grid-full{overflow-x:auto;}
+}
+@media (max-width:480px){
+  .courses-grid{grid-template-columns:1fr!important;}
+  .wizard-hero-title{font-size:17px;}
+}
+
+</style>
+</head>
+<body>
+<div class="app-shell">
+<div class="mob-topbar" id="mob-topbar">
+  <button class="mob-menu-btn" id="mob-menu-btn" aria-label="Menú">☰</button>
+  <div class="mob-title">UPC <span>Matrícula Inteligente</span></div>
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAJYAlgDASIAAhEBAxEB/8QAHQABAAICAwEBAAAAAAAAAAAAAAcIBQYBAwQJAv/EAE4QAAEDAwEDCQUEBwYCCAcAAAABAgMEBQYRBxIhCBMiMUFRYXGBFJGhscEVQlJiFiMyM3KCsiSSosLR8ENTNGOjpLO00uE3VVZzdISV/8QAHAEBAAICAwEAAAAAAAAAAAAAAAUGBAcBAwgC/8QAQhEAAgECAgUKBAQEBAYDAAAAAAECAwQFEQYhMUFRBxITImFxgZGhsRQywdEVI0JSM2Jy4ZKywvAXJDQ1Q6IlU4L/2gAMAwEAAhEDEQA/ALlgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/FRNDTwumnlZFExNXPe5GtRPFVMVj2UY9kFRVU9lu1NXSUiok6RO13derj2p4pqhw5JPJs7I0akoOcYtpbXlqXeZgAHJ1gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1jaJnFkwm0rW3Sbenei+z0rF/WTL4J2J3r1Gv7XtqtrwmndQ0nN117e3oU6L0Ye50ip1eXWvgVRyS+XTIrtNdLxWSVVVKvFzl4NTsRE7ETuQjry/jR6sNcvYvGjOh9XEmri5zjS9Zd3BdvlxM1tBz/Ic0uL5rjVPjpN79TRxuVIo07OHavipO/JSx91vwuqvc0e7Lc5/1aqnHmmcE97lcVwxOzVGQ5JQWWlRedq52x6/hRV4r6JqvoXos9vprTaqW2UcaR09LE2KNqdiNTQxMNhKrUdWevIsWnN1RsLGnh1vFRUteS/avu/ZnrABOGpQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHKjWq5yoiImqqvYACEttW2aGz89YMUmZNceLJ6xOLIO9G9iu8epPMwW3PbG6odPjWJVKthTVlXXxrxf3sjXu73dvYQGvFdVIa9xDLOFLz+xtDRXQvnKN3fx1bVF+8vt58Dsqp56qokqKmV800jlc+R7tXOVetVVTrAIU2okkskThyS8fSqyK45FMzVlDEkEKr/wAx/Wvo1P8AEWWI45ONnS07LKCRzdJa9z6p696OXRv+FEJHLRY0+joRXHWeftLL53uK1ZZ6ovmruWr3zYABllcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABXDlAbWXVkk+KYzU6UrVVlbVxu/er2xtX8Pevb1dXXnuUbtNW1wSYjYajStlbpXTsXjCxfuIv4lTr7k8ytRDYhe5Z0oeP2No6F6KqSjf3ce2Kf+Z/Tz4AAEKbUB+omOkkbG1NXOVGonip+TL4VTe2ZjZqVU1SWuhYqeCvQ5is2kddWoqdOU3uTZeDHKFtsx+3W5iIjaaljiRP4Woh7wC4pZLI8wTm5ycntYAByfIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANM2nbRbHg1BvVj0qbhI3WCjjd03eLvwt8V9D5nOMI86TyRkWtpWu6qo0IuUnsSNputyt9qonVtzrIKOmZojpZno1qa+KnoikZLG2WJ7XseiOa5q6oqL2opUm2z5Xtpz2CluFQ9KGN3OSsj1SGlh146J+JepFXiqlsbfSU9BQwUNJGkVPTxtjiYnU1qJoiGPbXDr5tLqkxjeCRwiNOnUqZ1Xrklsit2vjt/3t7wAZRXwAAAAAAAAAAAAaNtnzqHCMVfUROY651WsVFGv4u16p3N+eiG511VBRUc1ZVStiggYskj3Lwa1E1VSlW1XMKnNMvqbrIrm0rV5qjiX7kSLw9V618zBvrnoKeS2stmiOA/it3zqi/LhrfbwXjv7DWayonrKqWqqpXzTzPV8kj11VzlXVVU6gCtG+EklkgAAcg2fZO1H7S8cavV9ow/1IawbFsymSDaJj0qrojbjB/WiH3S+ePeYeIJu0qpftl7MvIAC4HmYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIqKmqcUBD+0255Pszuzcis6rcMbq5NKugmVVbTyL2sXrYjvdr2cUN22e57j+bUHPWqo3KliazUkqoksfp2p4pwOiNeLm6b1P/AHsJa4wevTto3lPrUnvW58JLc/TgzagAd5EgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAh/bttYjxmKTH8flZJeZG6TSpxSlRf8/h2HVWrRox50jPw3DbjErhW9us2/JLi+w9m2ja1R4hFJaLO6Orvj26KnWym17Xd7u5vvKwK685VkTUe+e4XSvmRqK5dXPcq/L4Ihj6iaWonfPPI+WWRyue966q5V61VSyXJkwBLdb0zG6waVdU1UoWOTjHEvW/zd2eHmQXPqX9Xm7F7G3/AIey0Qw2VVLnVHqz3yfDsS293aSFsowijwfGI6CNGyVsuklZOicZH6dSflTqT/3NvALBCChFRjsRpi6uat1WlWqvOUnm2AAfR0AAAAAAAAAAA6a6pgoqKesqXpHBBG6SRy9SNRNVUHKTk8kQryqMxWgs8GJUUuk9cnO1atXi2JF4N/mVPcniVpM5nuQz5Tltwvk6r/aJVWNq/cjTg1voiIYMqt3X6aq5btx6I0dwlYXYQoZdbbLve3y2eAABjE4AAAD12apWiu9FWIuiwVDJf7rkX6HkATyeZ8yipRcXvPoHDI2WFkrF1a9qORfBT9msbKLql52c2Kv3t57qRjJF/MxN13xabOXGEudFSW88x3NCVvWnSlti2vJ5AAH0dAAAAAAAAAAAAAAAAAAAAAAAAAAAB471baO8WqptdwhbNS1MaxysXtRfqU1zKy3vZpnj6elqp6eWB3O0VUxdFkjVeC/RU8FLrEebd8GbmOIvkpYkW60CLLSqicXp96P1ROHiiGDfW3Sw50fmRbtEccWHXPQ1v4VTU89ie5/R9ncYzYxtco8ujjtF5WOkvbU0b2MqdO1vc78vuJWPn7G+amqGyRufDNE7VrkVWuY5F+CoWg2D7V2ZLFHj2QTNZeY26QzO4JVIn+f5mPY3/P8Ay6m3iS+lmh/wqd5ZLqb4/t7V2e3dsmIAEsa6AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABpG2DPqTBcdWdFZLc6lFZRwKvWva935U+PUfFScacXKWxGTaWlW8rRoUVnKWpGC277T48QoFs9oka++VLOCpxSmYv31/N3J6lUKiaWonknnkfLLI5XPe9dVcq9aqp3XW4Vl1uM9xuFQ+oqqh6vlkeuquVTojY+WRscbVe96o1rUTVVVepCsXVzK4nm9m437o/gVHBrbo465v5pcX9luN52JYS/NMxihnYv2ZR6TVjuxW68Gebl4eWpcmKNkUTIomNYxjUa1rU0RETqRDTNjOHR4ZhVNRSMRK+oRJ6x3bvqn7Pk1OHvN1J2xt+hp69r2motLMbeK3z5j/Lhqj9X4+2QABmlWAAAAAAAAAAAABFHKeyNbNgH2XBJu1N2k5ngvFIk4vX5J6krlTeU9fluu0d9vjfvQWuFsCJ2b69J/wA0T0MK/q9HReW16i1aG4f8bisOcurDrPw2euRFYAKyb7AAAAAAAAALM8ku+pVYvcbBI/8AWUM/PRp/1cnX7nIvvJtKabCcmTGNotBPNJuUlWvstRqvBGv6lXydovvLllkw6rz6KW9ajRenGHO0xSVRLq1Osu/Y/XX4gAGeU4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqpylsJTH8pS/UMO7bro5XORqcI5+tyevWnqRRTzTU1RHUU8r4pY3I5j2LorVTqVFLw7RcZp8uxCusk6NR8rN6B6/8OVOLXe/4KpSG4UlRQV09FVxuiqIJHRyMXra5F0VCuYjb9FU5y2M3joVjP4jY9BVec6ep9q3P6Pu7S12wnabFmNtS1XWRkd8pmdLsSpYn308e9PUlEoJZ7jW2i509yt1Q+nqqd6PikavFFQuLshz6jzrHkqE3IbnTojaynRf2XfiT8q/+xIWF50q5k9vuUvTHRf8Pm7u2X5T2r9r+z3cNnA3YAEmUIAAAAAAAAAAAAAAAAAAAAAAAAAAAAHD3NYxXvcjWtTVVVdERADF5df7djGP1V6ucu5T07ddO17uxqd6qpSvO8ouOX5JUXq4v6Ui6RRIvRijTqYnl8V1Nv2+7QXZhkS0FvlX7GoHq2HReEz+pZF+SeHmRmV3ELvpZcyOxepu7Q3RxYbQ+Jrr82a/wrh3vf5Aljkz4gl/zNbzVxb1DadJOKcHzL+wnpxd6IRO1FcqIiKqrwRELqbGsWbieA0FA9iNq5m+0VS9vOOTXT0TRPQ+cPodLVzexGRpri34fhzhB9ep1V3b35avE3IAFkNEgAAAAAAAAAAAAAAHVWVEdLSTVUq7scMbpHr3IiaqUMyC4y3e+110mVVkq6h8ztfzOVS4m2+5/ZOy2+1DX7r5KfmGL4yKjfkqlLSDxafWjDxNs8nFplRrXL3tRXhrfugACINmAAAAAAAAABFVF1RdFLkbCcvbluC0z55UdcKFEp6tFXiqonRf6p8dSm5u2xnNZMKzCGslc5bdU6Q1rE/Aq8HebV4+/vMyxuOhqa9j2lX0twX8VsWoL8yGuPbxXj75F0AddNNFU08dRBI2WKVqPY9q6o5qpqiodhZzQbTTyYAAOAAAAAAAAAAAAAAAAAAAAAAAAAAAAVi5VGJJbcjgyeki0p7km5UaJwbM1Ov+ZvxRSzprG1LGmZZg9xs6tRZ3R85TKv3ZW8W+/q9TFvKHTUnHfuJ/RrFXhmIwqt9V6pdz+23wKQGcwbJ7liOR095tkmj410kjVejKxeti+C/AwsrHxSOjkarXsVWuavWip1ofkq8ZOLzW09A1qVOvTdOos4tZNcUXuw3I7dlWPU16tkm9DO3pNVelG9OtjvFFMwU92GbQJcKyNIayRy2atcjapn/LXqSRPLt709C4EMsc0LJoXtkje1HMc1dUci9SoWezuVcQz3raaC0lwGeD3XMWunLXF9nDvX9z9AAyyuAAAAAAAAAAAAAAAAAAAAAAAAAhTlM5/wDZNr/RK1z6V1azWre1eMUK/d83fLzJNz7JqPEcWrL3WKipC3SKPXjLIv7LU81+GpSW/XWtvd5qrtcJVlqqqRZJHL3r2J4J1IRmI3XRx5kdr9i+6D4B8bcfF1l1IPV2y/tt8jwgAr5ug33YLjSZLtGoYpo9+kol9rqNU4KjFTdRfN2nxLkkMclHHkoMPq7/ACs0muU27Gqpx5pnD4u3vchM5ZMOpdHRT3vWaK03xL4zFJQT6tPqrv3+urwAAM8p4AAAAAAAAAAAAAABDnKyr1p8BoqFF0Wrr26p3oxrl+ehVwsDywapedx6hReCNmlVP7iJ9SvxWsRlncPsN76D0ejwam/3OT9WvoAAYJbgAAAAAAAAAAACwPJq2kNjSPC73UaNVdLdM9er/qlX5e7uLCnz6Y90b2vY5WvaurXIuiovehaPYLtWiyOmix3IJ2svETd2GZ66JVNT/P8APrJvD73NKlPw+xqfTXRdwlLELWOp65Jbv5l2cfPjlMQAJg1kAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU/5RGN/o9tHq5IY9yluSe1xaJwRXL00/var6oRyWm5VOP/AGjg0F6iZrPa50VyonHmn6NX47qlWSr31LoqzS2PWegNEsR+PwunKT60eq/DZ6ZAsbyYtoC1VOmF3afWaFqut8j1/aYnFY/NOtPDXuK5HottbVW24U9fRTOhqaeRJIntXi1yLqinXbV3QqKSM3HMIp4tZyt57dqfB7n9+wv8DVtl2X02aYjTXeLdbUInN1USL+7lTrTyXrTwU2ktUJqcVJbGeeLm3qW1WVGqspReTAAPo6QAAAAAAAAAAAAAAAAAAAaDt1zJMQwieSnkRtxrtaekTtaqp0n/AMqfFUPipUVOLlLYjKsrSpe3ELekutJ5L/fYQdykc3/SPK/sWhm3rba3Kzorwkm6nO9P2U9e8ig5cqucrnKqqq6qq9pwVOtVdWbnLeejcNsKWH2sLalsivPi/Fg7KaGSoqIqeFquklejGNTtVV0RDrN52D2dL1tSs8L2b0VPItVIi90abyf4t04pw581FbzsvbmNrb1K8tkU35ItxiNojsOL22zxIiNpKZkS6dqonFfVdVMqAW9JJZI8z1Kkqs3OT1t5vxAAOT4AAAAAAAAAAAAAAAKycrqbezO0wa8I7fve+R3+hChL/KwdrtHpm/ht0f8AW8iAq16868j0LorHm4Pbr+X3bAAMUsAAAAAAAAAAAAAP3DLJDMyaGR0cjHI5j2rorVTqVFPwAcNZlk9i22mG4tgsGXTthreDIK53Bk3cj+53j1KTmioqaouqHz5Jq2KbZJ7I6GwZTM+e2LoyCqd0n0/cju9nxTyJmzxHZCr5/c1fpRoTnzrrD12uH1j9vLgWcB1080NTBHUU8rJYpGo5j2Lq1yL1KinYTRqxpp5MAAHAAAAAAAAAAAAAAAAAAAAAAAABjsntcV7x24WidEVlXTvhXXsVU0RfRdFKH1lPLSVc1LO3dlhkdG9O5yLop9ASm236z/Y21O7MY3diqnJVR6J2PTVf8W8RGLU84xn4Gy+Ti95teravelJeGp+68jQgAQZtokXYHmy4hmMcVVKrbXcFSGpRV4MXXoyeirx8FUuCioqIqKiovUqHz5LbcnLM/wBJsNbbayXeuVqRIZNV4vi+473Jovl4kzhdx/4peBq7lAwTNLEaS7JfR/TyJQABNGqwAAAAAAAAAAAAAAAAAAvBNVKcbecvXLM7qHQSb1voNaalRF4KiL0n+q/BELEbe8r/AEW2f1ToJNyur/7LTaLxRXJ0nejdfVUKcELitfZSXezaXJ5hHz39Rfyx+r+nmAAQxtME8ckK1c5dr3eXt4Qwsp2L4uVXL8Gp7yBy1nJWtyUmzV9YrdHVtbI/XvRujE+Smdh0OdXXYVHTi56DB5pbZNR9c36IloAFlNEAAAAAAAAAAAAAAAAAAFV+Vg1U2kUzvxW6P+t5EJNPK5h3M2tc+nCS36e6R3+pCxVr1ZV5HobRaXOwi3f8oABik+AAAAAAAAAAAAAAAAAASxsO2rVGJ1MdlvUr57HK7Rrl4upVXtT8venqhaqlngqqaOpppWTQytR8cjF1a5q9Sop8/SY+T/tRfj1XHjd+nVbRO/SCV6/9Fev+Rfh195LWF9zGqdR6txrnTDRNXMZXtnHrrXJL9Xau3379towcNVHNRzVRUVNUVO05J01AAAAAAAAAAAAAAAAAAAAAAAAACunK+te5cLHemt/eRyUz18Wqjm/1OLFkUcqa3JV7Mva0bq6irI5Ne5HasX+pDEvoc+hJFj0Sufh8Xoy4vm+ay9yqAAKueggbdsiyx+H5xRXNz1Ske7matvfE5eK+nBfQ1EH1CbhJSW1HRdW1O6oyo1FnGSyfifQSJ7JY2yxuR7HojmuReCovUp+iLeTXla5BgjbdUy71baVSB2q8XR/cX3ap/KSkW2lUVWCmt55uxGxnYXU7apti8vs/FawADsMIAAAAAAAAAAAAAGDz2+xYzh9zvciprTQOdGi/eevBqerlQ4lJRTbOyjSnWqRpwWbk0l3srPyl8n+3c/fbYJN6ktLeYaiLwWReL19+ifykWnZUzy1NTLUTvV8sr1e9y9auVdVU6yo1qjqzc3vPSeG2MLC0p20NkVl4734vWAAdZnAutsWovYNluPwbu6rqRsq+b1V31KUoiqqInWpfbG6ZKPHbbSImiQ0kUenkxEJbCY9eT7DW3KRWytqFLjJvyX9zIAAnTUYAAAAAAAAAAAAAAAAABXjlg0ipUY9XInBWTRKvkrVT5qQAWi5WdAtRgVDXImq0lc3Ve5HtcnzRCrpWsRjlcPtN76D1ulwamv2uS9W/qAAYJbgAAAAAAAAAAAAAAAAAAAACx3Js2krWxR4bfKjWojbpb5nrxkan/DVe9Ozw4dhPB8/qSonpKqKqppXwzwvR8b2rorXIuqKhcrY1nEOb4nHVSOa25U2kVbGn4tOD0Tud1+9OwnsOu+eujltWw09pxo6rWp8dbrqSfWXB8e5+/ebuACVNdgAAAAAAAAAAAAAAAAAAAAA1LbJRe37L8hp93VUo3SJ5s6X0NtPDkVOlXj9xpVTVJqWWPTzYqHxUjzoNGVZVehuadT9sk/JlBwHIqKqL1oCnnpsAAAkHYBk641tFo+ek3KO4f2So1Xgm8vRd6O09FUuKfPprnMcjmqqORdUVOxS7uynIkyjArXdlcjp3RJHUeErOi736a+pN4VWzTpvvNUcouGc2dO+itvVfftXpmvBG0AAmDWIAAAAAAAAAAAAIH5W+Q8za7XjML9HVD1qp0T8LeDUXzVVX+Ungphtzvv2/tNu1Sx+9BTyeyw6dW7HwX3rvL6kfiVXmUclvLnoLh/xWKKpJaqaz8di+/gaQACuG8gAAD1WeLn7vRwf8yoYz3uRC/bGo1jWp1ImhRHCY+dzKyx/iuECf9o0veTeELqyfcan5SZ/m28eyX0AAJg1kAAAAAAAAAAAAAAAAAAaZtvta3bZbfKZrd58dPz7E8Y1R/wAkUpYfQGrgjqqWamlTejlY6N6d6KmilDcjtstnv9fapkVH0lQ+FdfyuVCDxaHWjPwNs8nF3nRrWz3NSXjqfsjwAAiDZgAAAAAAAAAAAAAAAAAAAAANv2R5jNhWY09x3nLRSqkNZGn3o1Xr80608vE1AH1CbhJSjtRj3VtTuqMqNVZxksmfQKlnhqqaKpp5GyQysR8b2rqjmqmqKh2EL8lvMVuuPS4vWy71VbU3qdXLxdAq9X8q8PJUJoLZQqqtTU1vPOeLYdUw27nbVP0vzW5+KAAO0jgAAAAAAAAAAAAAAAAAAcPajmOavUqaHIAKBXaLmbrVw/8ALne33OVDzGUy5u5ld3Z+GumT/GpiymyWTZ6goS51OL4pAAHB2gsByRsg3ZrtjMz+DkSrp0Ve1NGvRP8ACpX82vZFfFx3aLZ7ir92Ln0hm/gf0V+evoZFpV6KtGRCaR2Hx+G1aKWvLNd61r7F2wAWs86gAAAAAAAAAAAGHza7tsOI3W8OXT2WlfI3xdp0U9+hROV75ZXyyOVz3uVzlXtVS1XKnu/sGzllvY7R9xqmRqnexvTX4o33lUyAxWpnUUeBuTk7s+isZ3D2zl6L+7YABFmwQAADPbO0Rc9sCKuifaMH/iIXoKJ4I9I82sb16m3CBf8AtGl7Ccwn5JGpOUhf8xQfY/cAAlzWoAAAAAAAAAAAAAAAAAAKocqGwra9on2lGzdgukLZtU6ucb0XfJq+pa8izlM42t72evuEEe9U2qT2hNOtY14PT3aL/KYV/S6Si8tq1lo0OxFWOK03J9WfVfjs9cipgAKyb9AAAAAAAAAAAAAAAAAAAAAAAANi2b5JNieZ269xqvNxSI2dqffidwenu4+aIXgppoqmnjqIHo+KViPY5OpzVTVFPn6W25NWSLfNncVDNJvVVqf7M7VeKs62L7uH8pL4VWyk6b36zWnKJhanRhfQWuPVfc9nk9XiSgACcNSgAAAAAAAAAAAAAAAAAAAAFEM1XXMr0qf/ADCf/wARxiDJZS/nMnusiferZne96mNKdP5menrZZUYLsXsAAfJ3gIqoqKi6KnUoABeXZvePt/BLNdVdvPnpWc4v50Tdd8UU2Eh3kn3b2zA6u1vdq+gq13U16mPTeT47xMRbbap0lKMuw8343Z/BYhWoLYpPLuetegAB3EUAAAAAAAAAVq5XV057JbRaGu6NNSumcn5nu0+TPiQcb9yg7gtx2sXhddW07mU7f5Goi/HU0Eql3Pn15PtPROjdt8NhVCn/ACp+ev6gAGOTgAAB7bBL7PfbfPrpzdVG/wBzkUvyi6oip2nz6Y5WPa5OtF1QvzY6hKuy0NUi6pNTxyIvm1FJrCH867jVnKVT/wCnn/Uv8p7AATJq0AAAAAAAAAAAAAAAAAAHVV08NXSy0tQxJIZmLHI1epzVTRUO0A5TaeaKMbQsdnxXMLjZJkXdglXmXL9+NeLF9yoYAszyqMPW42ODK6KLWot6c3VbqcXQqvB38q/BV7isxVbuh0NVx3bj0Po5iyxSwhWz6y1S7199viAAYxOgAAAAAAAAAAAAAAAAAAAAAlnkuX5bXtCW1yP0gukCxaKvDnG9Jv8AmT1ImMhjdyls2QW+6wqqPpKhkyaflciqh20KnR1FPgR2LWSvrKrbv9SeXfu9S+wOuknjqaWKpidvRysR7F70VNUOwtx5saaeTAABwAAAAAAAAAAAAAAAD8TvSOCSReprVX3IfsxeX1SUWKXerVdOZopn6+TFOJPJZnZSg6k4wW95FE6+Tnq6om69+VzveqqdIBTT1BFZLIAAHIAABNXJIufs+Y3O1udo2ro+can5mOT6OUs4Uz2CXBbdtYskm9o2aV0DvJ7VanxVC5hYcLnnRy4M0nygW3RYoqi/XFPxWa+iAAJIowAAAAAACromq9QPFf6n2OxXCr105mmkk18mqpw3ksz6hFzkoreUbzCtW45Zdq5V15+tlkRfBXroYo5c5XOVy9arqpwU6TzeZ6fpU1TgoLYlkAAcHYAAAC7Wx6u+0dmGP1O9vL7EyN3mzor/AElJS1vJYuSVmzRaNXavoaySPTua7R6f1KSeFSyqtcUUHlDt+kw6FVfpkvJpr3yJZABYDTAAAAAAAAAAAAAAAAAAAAAB1VtNBW0c1JVRNlgmYscjHJwc1U0VClG1TEajC8wqrTIjnUyrztJIv34l6vVOpfFC7hoO2/BWZrij20zGpdaJFlo3/iXtjVe53z0MG/tump5rai26IY7+F3nNqP8ALnqfY9z8N/YU3B+54pIJnwzMdHJG5WvY5NFaqcFRT8FaN7p560AADkAAAAAAAAAAAAAAAAAAAAAulsQui3fZbY6lzt58dPzD18Y1VnyRDdCGuSXXrUYJX0Dl1WkrlVE7mvai/NFJlLZaz59GL7DzlpBbfDYnXpLYpPyete4AB3kOAAAAAAAAAAAAAAADSdulalBsov0u9oslOkLfN7kb9VN2Ie5WFxSm2f0tvRdHVta3VO9rEVy/HdOi6lzKMn2Exo/b/EYnQp/zLyTzfoirQAKmejQAAAAADJYrWLb8mtdci6LT1kUmvk9FL6IqKiKnUvFD58tVUcip1pxQvvjlT7Zj1uq9deepYpNfNiKTWES+aPcas5SaP/T1f6l7P7nvABMmrQAAAAAAaztWqPZNm2QzouipQSonq3T6mzGj7epOa2RZA7vgY33yMT6nVWeVOT7GZ+FQ6S+ow4yivVFMQAVE9LAAAAAAAnbkh3bmr1ebK9+iTwMqI08WLovwcnuIJNz2JXr7C2nWare/cilm9nlXs3ZOj81RfQyLSp0daMiE0js/jMLrUltyzXeta9i6YALWedQAAAAAAAAAAAAAAAAAAAAAAACvfKW2bqjpM0skGqLxuMLE6v8ArU+vv7yvp9BJo45onxSsa+N7Va5rk1RyL1oqFTtvGzKXELm672mJz7HVP4InH2Z6/cX8vcvoQeI2fNfSw2bzbWhOkyqxWH3L6y+V8V+3vW7itXfFgAIg2WAAAAAAAAAAAAAAAAAAAAAT5yPqtUr8goVXg6KGZE8lci/NCxRVvkmVHN7Qa2DXhNbn/B7FLSFkw15268TROnVLmYzN8VF+mX0AAM8qAAAAAAAAAAAAAAAAK0crm6pPk9ps7H6pS0rpnp+Z7tE+DfiWXKT7ZLz9u7Sr1XNfvxNqFgiX8sfQT5a+pG4pU5tHm8S9cn9n02Jus9kIt+L1L0zNRABXjdYAAAAAALvbJqj2rZpj0yrqq0ETfcmn0KQlzdgknO7Isfd3Qvb7pXp9CVwl/mSXYa85R4Z2NKfCeXmn9jeQATxp0AAAAAAEf8oldNjd+XwgT/vEZIBH3KLTXY3fvKn/APMRnTc/wZ9z9iUwP/udt/XD/MinQAKkekQAAAAAAfqN745GyMcrXtVHNVOxUPyAC9OAXtmR4Zary1yK6ppmrJ4PRNHJ/eRTOkFckrIkns9xxiaTp0r/AGmnRfwO4ORPJ2i/zE6lstqvS0oyPOOPYe8PxCrb7k9Xc9a9AADvIgAAAAAAAAAAAAAAAAAAAAAHmulBR3S3T2+4U8dRSzsVksb01RyKekBrM5jJxalF5NFPds2zOtwe5rVUrZKiyVD/ANRPpqsS/gf49y9pHZfy7W+iutunt1xpo6mlnYrJInpqjkKo7ZtlNdhlS+521slXYpHdGTTV1Oq/df4dziv3tg6fXhs9jcuiml8b5K1u3lV3P939/cjEAEYX8AAAAAAAAAAAAAAAAAAlPkuPVu1WJv46OZPgi/QtmVI5MP8A8WaT/wDFn/pLblhwv+B4mk+UFf8Ayq/oXuwACSKMAAAAAAAAAAAAAAAYDaJe247hN2vDnIjqemdzfi9eDU96oUZe5z3ue9Vc5y6qq9qlj+VtkKQWe24zDJ06qT2mdE/A3g1F83Kq/wApW8r2KVedV5q3G6uT/D/h8PdxJa6j9FqXrmAARpewAAAAAAXG5Oq67G7CvhOn/eJCnJcXk6JpsasP/wCx/wCYlJPCv4z7vqig8ov/AGyn/Wv8siQQAWA0wAAAAAADROUBHzmyC/t7o4ne6Zi/Q3s1LbHB7TsuyKJE1/sT3f3el9DqrrOlJdjJDCJ8y/oS4Tj7opMAConpUAAAAAAAAA2rZNkq4pnltuznK2n5zmqlO+J/B3u6/Qu2xzXsa9jkc1yaoqdSofPot3ydMsTJMChpKiXerrXpTS6rxczToO93D0JjCq2TdN96NZcoeFc+nC+gtnVl3bn56vFElgAmzU4AAAAAAAAAAAAAAAAAAAAAAAAOuqggqqaSmqYmTQytVr43t1a5F60VDsAOU2nmisG27Y9NYFmv+MxPmtKqrp6ZOL6bxTvZ8iGD6Cua1zVa5Ec1U0VFTgqFbdvmyRLZz2UYxTr7Eqq+spGJ+573tT8PenZ5dUHfWHNzqU9m9G2NEtMemcbO+l1tkZcex9vB79+vbBgAIg2YAAAAAAAAAAAAAAASryWY1ftTa/ThHQzO/pT6lsSsXJHpucze6VWnCGg3dfFz2/6KWdLHhiyoeJo/T6fOxdrhGK+v1AAJApQAAAAAAAAAAAAOHORrVc5URqJqqr2HJHPKFytMZwCohgl3a65a00Gi8UaqdN3o3h5qh8Vaipwc3uMuws6l7cwt6e2Ty/v4bSte13JFyrP7ldGPV1MknM03/wBpnBPfxX1NTAKjObnJye89J2tvC2owo0/likl4AAHyd4AAAAAALlcn1ix7H7A1e2OV3vmkX6lNS62xaFYNleOxqmn9ja7+8qu+pKYSvzW+w17yjSyw+lH+f/S/ubgACfNOAAAAAAAxWY03tmJXel0152hmYiebFMqfmZiSwvjd1ParV9TiSzWR2UpunUjNbnmfPsHqu9OtHdqykcmiwTvjVP4XKn0PKU1rI9PxkpJSW8AAH0AAAAAADediGXrh+dU1TPIrbfV6U9WnYjVXg7+VdF8tTRgfdObpyUltRjXlpTvKE6FVZxksmfQVrmuajmqitVNUVOpUOSJ+TbmyZFin2JXTb1ytbUZ0l4yQ9TXen7K+neSwWyjVVWCnHeeccSsKuH3U7arti/Nbn4oAA7DBAAAAAAAAAAAAAAAAAAAAAAAABw9rXscx7Uc1yaKipqip3HIAKo8oLZv+il1+27RCv2LWP4tanCmkXju/wr2e4icvvkNoob9Zaq0XKFJaWpjVj2r2dyp3Ki8UUpPtAxetw/KauyVqK7mnb0MunCWNf2XJ/vrRSvYhadFLnx2M3XoXpE8RofC13+ZBbf3Lj3rf58TAAAjS9AAAAAAAAAAAAFiOR/Q6UmQXJU/akigavkjnL80J+Iu5MNtWg2WwVDm6PrqmWfzTXcT+klEtNlDm0Io896VXHxGL15Lc8v8ACsvoAAZRXgAAAAAAAAAAAAqoiaquiIU5285f+ludTup5N630GtNS6LwdovSf6r8EQnflE5smL4e63Uc27c7o1Yo9F4xx/ff9E8V8CpBC4pcbKS8TavJ9gvNUsQqLbqj9X9PMAAhjaAAAAAAAAAAL2YJTex4VZKbTRY6CFqp47iFGaCBamup6ZqarLK1iJ5roX8pIkgpYoG9UbGsT0TQmMIjrk+41hyk1cqdvT7ZP2+52AAmzVIAAAAAAAABSXbDQ/Z207IKZG6N9tfI3yf00/qNTJX5U1uWj2m+1o3RtbRxya96t1Yv9KEUFSuY8yrJdp6QwO4+Iw6hU4xXnlk/UAA6SVAAAAAAAAAM7gWTVuI5TR3yiVVWF2ksevCWNf2mr5p8dC7eP3aivtlpbvbpUlpaqNJI3J49i+KdSlByZuTXtBSx3b9F7rPu26uk/s73LwhmXs8Ed89O9SSw666OXMlsfuUPTfAHfW/xdFfmQWvtj91tXiWgABYTSwAAAAAAAAAAAAAAAAAAAAAAAAAAAIr5R+FJkmIOu9HDvXK1NWRu6nGSL77fTrTyXvJUOHNRzVa5EVFTRUXtOurSVWDg95m4df1cPuoXNLbF+fFeK1Hz6Bue2fFv0Sz6uoImK2jmX2il7ubd2ei6p6GmFSnBwk4vcekLS5p3dCFem+rJJrxAAPkyAAAAAAAfqNjpJGxsRXOcqIiJ2qp+TdNidiXINpdopHM3oYZfaZu7cj6XxVET1PqnBzkoreY13cxtaE689kU35It1hVqbY8RtNpRNFpaSON38SNTe+OpmAC4RSiskeZ6tSVWcqktreb8QADk6wAAAAAAAAAeS8XGjtFrqbnXzNhpaaNZJXr2Ih6ytHKZ2hJdK9cQtM+tHSv1rZGLwllTqZ5N7fHyMe5uFQpuT8CZwHB6mLXkaEdm2T4L77l2kZ7SMqq8yyyrvVTvNjeu5TxKv7qJP2W/VfFVNcAKtKTm3J7WehrehTt6UaVNZRiskgAD5O4AAAAAAAAA2XZZQ/aW0awUemqOro3OTwau8vwQvCVJ5MNu9t2p09QrdWUVNLMq9yqm4n9RbYn8KjlScuLNNcolxz8Qp0l+mPq2/pkAAShr8AAAAAAAAAgPlfWzeoLFeWt/dySUz1/iRHN/pcV1Li8oa0/a2yq6brd6Sj3apnD8C9L/CrinRXMThza+fE3hoFddNhSp74Nr6/UAAjy6gAAAAAAAAAIqoqKiqip1KgABavk87R25PaG2C7Tp9sUUejXOXjURJ1O8XJ2+/vJbKC2W511mutNdLbO6Crpno+N7exU+aeBcnZPndDnWOtrIlbFXwojKym14sd3p+VexfQsGH3nSLo57V6ml9M9GnY1XeW6/Lk9a/a/s93B6uBuIAJMoQAAAAAAAAAAAAAAAAAAAAAAAAAABC3Kvx5K7EqPIIWazW6bm5FROPNP4fB2nvUrEXtze0svuIXW0Pbr7VSvY3wdp0V9+hRN7XMe5jkVHNXRUXsUr+KUubVUlvNz8nt+69hK3k9dN6u56/fM4ABGF+AAAAAABY3kk44sNtuWUTx6OqHJS06qn3W8XqnmuifylerXRVFyuVNb6SNZKiplbFG1O1zl0QvPhtjp8bxe32SmRNykhaxVT7zutzvVVVSTwujz6nPexFC0/xNW9irWL61R/8Aqtb83l6mXABYDS4AAAAAAAAAANS2pZxb8Gx19fUK2WslRWUlNrxlf3r3NTtU+ZzjCLlLYjvtrardVY0aKzlLUkazt/2jMxGyraLZMn21WsVGqi8aeNeCvXx7E9/YVNe5z3q97lc5y6qqrqqqe2/3evvt4qbtc53T1dS9XyPX5J3InUiHhKvd3LuJ57txv/R3AqeD2qprXN65Pi/st3nvAAMYnwAAAAAAAAAAACwnJAtfRvt5c3rWOmYvvc7/AClgiOeTlaPsrZXb3vbuyVz31TvJy6N/wohIxabKHMoRR550pu/isWrzWxPL/Dq+gABlEAAAAAAAAAAea6UcVwtlVQToixVML4novc5FRfmUMu9FLbbrV26dFSWmmfC9F72qqfQv4VF5Slj+yNptTUsZuwXKNtUxeze/Zf8AFNfUicWp5wU+Bsbk6vejuqts38yzXev7P0IzABBG3wAAAAAAAAAAAAZzB8oumIZBBeLVLpIxdJI1Xoys7Wu8PkYMHMZOLzW06q1GnXpunUWcXqaLzYDltqzLH4rta5OvozQuXpwv7Wu+i9psBR7Z3md2wm/MudtfvRu0bUU7l6EzO5fHuXsLh4NllozGxR3W0zo5q8JYnL04X9rXJ/vUslneKvHJ/MaM0o0YqYRV6SnrpPY+HY/o95ngAZxUgAAAAAAAAAAAAAAAAAAAAAAAAUa2l29LXtAvtA1NGxV0u6n5Vcqp8FQvKU75RNOlPtcvGiac5zUnvjaRWLRzpp9psPk5rON9Vp8Y5+TX3I9ABAm4gAAAAe/HbRW3690lot8ayVNVKkbE7E161XwROK+Ryk28kfE5xpxc5PJLWyX+Sth6199nyysi1pqDWKl3k4OmVOK/yovvUswYfC8fo8XxmisdCic3TRojnacXvXi5y+KrqpmC02tDoKSjv3nnnSLFnit/Ov8Ap2R7ls89viAAZJBgAAAAAAAwOc5ZaMOsUl1u06NanCKJq9OZ/Y1qf70OJSUVm9h20aNSvUVOms5PUkjjPMstWHWCW7XSXRG9GGFq9OZ/Y1qfXsKbZ3lV0zHIZrxdJNXO6MUSL0IWdjW/74nftFzO7Ztfn3K5P3I26tp6dq9CFncnj3r2mtFbvbx13zY/KjeOi2jEMIpdLV11ZbXwXBfV7wADBLeAAAAAAAAAAAAD0WujluFypaCBqulqZmxMRO9yoifM85JfJtsS3jabS1D2b0FtY6qeunDeTgz/ABKi+h2UafSTUeJhYleKytKlw/0pv7epbCzUMVstNHboERIqWBkLNO5qIn0PWAW5LLUeaZSc5OT2sAA5PkAAAAAAAAAEM8q7H/b8NpL7CzWW2z7sionHmpNEX3ORvvJmMdk9pgvuPV9nqURYqyB8S+GqcF9F0U6bil0tNw4kng1+8PvqVz+16+7Y/QoUD03SinttyqbfVMVk9NK6KRq9jmrovyPMVJrI9IRkpJSWxgAA+gAAAAAAAAAAAAbBgmXXjDb2y6WifdXgk0Lv3czPwuT69aGvg5jJxea2nVXoU69N0qsc4vamXb2b53Zc4tCVdukSOqjRPaaR69OJfq3uU2soTj16ueP3aG6WirkpaqJdWvYvWnaip2ovcpafZHtdtWYRx225rHb72iac2q6Rzr3sVe38vX5lgs7+NXqz1S9zTOkuhtXD27i1TlS4b49/FdvnxJPABJFFAAAAAAAAAAAAAAAAAAAAABUTlMqi7W6/Tsgg1/uIW7Kb8oOpSp2uXtUXVI3xx/3Y2oRmKv8AJXeX3k7i3ic3wg/eJoIAK+boAAABZvky4Ctotf6WXSDdrq1mlIxycYoV+94K75eZGuwHZ0/Lr4l1uUK/YtC9FfqnCeROKMTw7V93aW0Y1rGoxjUa1qaIiJwRCYw21zfSy8Puax070hUYvDqD1v53/p+/lxOQATZqgAAAAAAAEXbXNr1qxGOW22pYrhetNNxF1jp173qnb+VPXQ66tWFKPOm8kZthh9xiFZUbePOk/TtfBGzbSc8suD2laq4SJLVSIvs1IxenKv0b3qVDzvLrxmV7fdLvPvLxSGFv7uFv4Wp9e0x+QXm53+6zXS71clVVTLq5716vBE7ETuQ8BXbu9lXeS1RN3aOaL0MHhz5daq9r4di7O3a/QAAwi1AAAAAAAAAAAAAAAAtDyUsf+z8Nqr7NHpLcptI1VOPNM1RPe5Xe4rRaKCoul1pbbSMV89VM2KNE73LohezG7VBY7BQ2ilREio4GRN8dE4r6rxJTCqXOqOb3GveULEehs4WsXrm833L++XkZAAE+acAAAAAAAAAAAAAAAKscqTGVtOax3yCPSmurN56onBJm6I73povvIgLn7bcV/SzZ/W0kUe9W0ye00vDjvtT9n1TVPUpgqKiqipoqdaFbxGj0dbNbHrN66E4p8dhsacn1qfVfduflq8AADALgAAAAAAAAAAAAAAADlj3Me17HK1zV1RyLoqL3nAAJx2U7dKu2pFacwWSspE0ayuamssafnT7yePX5lirRc7fd6CKvtlZDV0sqaslidvIv++4oIbDhOZ5Dh9f7VZK58TXLrJA/pRS/xN+vWSdriUqfVqa16lAx/QaheN1rPKE+H6X9vDV2F5QRVs52245kaR0d4VtmuTtE0ld+pkX8r+zyX3qSo1zXtRzXI5qpqiouqKTlKrCqs4PM1Pf4bdYfU6K5g4v37nsfgcgA7DBAAAAAAAAAAAAAAAC8E1KKZ9cPtXN71cEXVs9dK5q/l3l0+Ghc7aDdm2LCLxdVdotPSPVn8apo34qhRZVVVVVXVV4qQuLT+WHibT5N7V/n3D7Ir3f0AAIY2kDbNl2D3HOciZQUqOipI1R1XU6cImfVy9iHl2f4fds0v0drtcWjeDp53J0IWdrl+idpcfBcVtWH4/DaLVFoxvSllcnTmf2ucv8AvQz7KzdeXOl8q9SnaV6Twwql0NF51pbP5Vxf0X0Pdj1nt9gs1NaLXA2ClpmbrGp296r3qvWqnvALGkkskaNnOVSTnN5t7WAAcnyADh7msYr3uRrWpqqquiIgByeO83S3Wa3y3C6VkNJSxJq+SV2iJ/qvgRntF2347jySUVk3bzcU1T9W79RGvi/t8k96Fcc0zHIMvr/a73XvmRF/Vwt6MUSdzW9Xr1kfc4hTpao62XTA9CrzEGqlf8un27X3L6v1JO2rbc6y6JLasQ5yio11a+tdwmlT8v4E8evyISe5z3q97lc5y6qqrqqqcAga1edaXOmzb+GYTa4ZS6K2jkt73vvYAB1EkAAAAAAAAAAAAAAAADljXPcjWornKuiInWqgExclfGPtPL58gqI9aa1s0jVU4LM9NE9yar6oWjNO2OYsmJYFQ26RiNq5W8/Vr2847iqeiaJ6G4lpsqPQ0kntPPelGKfiWJTqRfVXVj3L7vN+IABlFeAAAAAAAAAAAAAAABT/AJQWIri+eTy08W7b7lrU0+icGqq9NnovwVC4Bou2/DkzHB6ingjR1wpNaijXtVyJxZ/MnDz0MO+odNSeW1bCz6JYx+GYhFzfUn1ZfR+D9MymYOXtcxytcitci6KipxRTgrBv4AAAAAAAAAAAAAAAAAAAAAG7YHtQyzEFZDRVy1VC1eNJU6vj0/L2t9DSQfUKkoPOLyZjXVpQu6bpV4KUeDLYYRtzxO+IynuznWSsXgqTrrCq+D06vVEJSpp4KmBs9NNHNE9NWvjcjmqngqHz9M5i+XZJjMySWS71VImuqxtdrG7zavBfcSlHFZLVUWZr/FOTyhUznZT5r4PWvPavUvUCuWKcoquhRkOTWaOpanBZ6R247zVi8F9FQlXGtrGCX7dbBe4qSZ3/AAaxOZdr5rwX0Uk6V5RqbJFCv9GMUsc3UpNrita9NnjkbwD8QyxTRpJDIyRjuKOY5FRfVD9mUQDWW0AAAAAAAAAhblY39KLEqKwRP0luE/OSIi8ebj4/Fyt9xWI33bzkyZNtGrpYZN+kov7JT6LwVGKu8qebtV9xoRVr2r0tZtbNh6D0Vw54fhdOnJdZ9Z97+yyQNo2c4Pec3vKUNtjVkDFRamqenQhb4969ydpm9kuy275vUtq5kfQ2Zjv1lU5vGTvbGnavj1J8C1+L2C1Y1Z4bVZ6RlNTRJ1J1uXtc5e1V7zvs7CVbrT1R9yK0n0vpYanb2zUqvpHv7ezz7fJgmJWjDrHHarTDup1zTOTpzP7XOX6dhnwCwRiorJbDS1evUr1HUqvOT1tsA66ieCniWWomjhjb1ve5Gonqpo+S7XMDsSOZJeo62Zv/AAqNOdXXzTop7zidSEFnJ5Hba2Nzdy5tCm5PsTZvh1VVTT0kD6iqnighYmrpJHo1qJ4qpXTK+UTcp0fDjdnio2rwSeqXnH+aNTgnrqRHk2V5Fks/O3u71VZx1Rj36Mb5NTgnuI+rilKOqGsueHcn9/cZSuWqa835LV6llM3264rZEkp7PvXusTgnNLuwovi9ev0RSBM72m5Zl7nxV9etPRKvCkptWR6ePa71U0wEVXvatbU3kuCNiYTorh2GZShDnT/dLW/DcvAAAxCyAAAAAAAAAAAAAAAAAAAAAAk3k54guS5zHXVMW9b7VpPLqnB0n3G+9NfQjSKN8srIomK+R7ka1qJqqqvUiF0tjmIMw3CaW3vY1K6ZOfrHJ2yOTq8mponoZ2H2/S1c3sRUdMsY/DrBwg+vU1Lu3vy9WbkACymiAAAAAAAAAAAAAAAAAAAAACqnKUwhcfyj7eoYd223RyucjU4RTdbk9etPUiQvXnON0WWYxWWOuRNydnQfpxjen7Lk8lKSZJZ66wXyrs9xiWOppZFY9Oxe5U8FTinmV3Ebbop89bGbv0Jx38QtPh6r/Mp6u+O5+Gx+HEx4AI4uwAAAAAAAAAAAAAAAAAAAAAAAAAABk7LkN9ssiPtN3rqJU7IZnNT3a6Kb5ZNume25GtqKukuTE7KmBNV9W6KRgDthXqU/lk0R93hVlefx6UZd6WfntLB2jlIcEbdsY49rqWo+jk+ptdt2/YLUontLblROXr5yn3kT1aqlUQZUcSrx2vMr9xoLg9X5YOPc39cy5tJtc2d1KIrclpo9eyWN7Pm0ydPtAwio/dZVaF176pqfNSj4O5YtU3xRFz5ObF/JVkvJ/RF8ockx6Zm/FfbW9qdrati/UjPbNtes9ostRacbr4q67VDFj52B28ynReCu3k4K7uRCrIOKmKTnHmxWR2WPJ9aW9dVatRzS15ZJLx25hVVVVVXVV61JI2SYtiNXKy9ZtkNupKJjtYqF1QiSTKna9E4tb4dakbgjqc1CXOazLpfW1S5oulCo4Z71ty7OHeXEfta2Z2qlZTU97g5mJqNZFTU71a1E6kREboYO5coPCqdF9kpbrWO7N2FrEX+876FVwZ7xSs9iSKlS5P8ADIvOcpy72vokT9duUhOurbVjMbO51TUK74NRPmaZe9uGf3JHNiuFPb2L2UsCIqertVI0Bjzva89siZttFsIttcKCff1vfMyN4vt6vEiyXW61ta5eP6+Zz09yqY4Axm29bJ2FOFOPNgsl2AAHB9gAAAAAAAAAAAAAAAAAAAAAAAAAymJ2KuyXIaOy25m9UVMiNRdODE7XL4ImqnKTk8kfFSpClBzm8ktbfYShyY8IW85C7J6+HWhtrv1COThJP2ejU4+ehaIxOIWGhxnHKOyW9m7BTRo3e04vd95y+Krqpli02luqFNR37zz1pFjEsWvZVv0rVFdn99rAAMkggAAAAAAAAAAAAAAAAAAAAAQ7yktny3+z/pNaoN650Ef69jU4zQpx9Vb1+WvgTEFRFTRU1RTqrUo1oOEiQwvEa2G3UbmjtXqt6fefPkEt8ojZ0uM3hb/aYNLPWyava1OFPKvW3wavWnu7iJCq1qUqU3CR6Gw3EaOI20bii9T9HvT7UAAdZngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtZyc9n/wCjVh+3rnBu3a4MRWtcnGCFeKN8FXrX0QjTk5bOlyG7NyW7wa2qik/UscnColT5tb2+PDvLSk1htr/5ZeH3NV6d6RZ54dQf9b/0/V+XEAAmTVwAAAAAAAAAAAAAAAAAAAAAAAAAAB473a6G9WmptdygbPS1LFZIx3ai/JfEpptVwevwbJH0M6OlopVV9HUacJGdy/mTqVP9S65r+f4nbMyx2a0XJmm90oZkTpQv7HJ9U7UMK8tFXjq2otOi+kU8HuMp66UvmXDtXavVeBRkGazXGbpiV/ns91h3JY11Y9E6MrOx7V7lMKVqUXF5Pab4o1oVoKpTecXrTQABwdgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANw2T4NW5zkjKKNHRUEKo+sqETgxncn5l6k9/YYnC8ZumWX+CzWqLflkXV71ToxM7XuXsRC5mA4nbMNx2Gz21mqN6U0yp0ppO1y/6diGfY2jry50vlRT9LNJY4TR6Kk/zZbOxcX9DK2e20VotdPbLdA2Clpo0jijb1IifU9YBY0slkjRkpSnJyk82wADk+QAAAAAAAAAAAAAAAAAAAAAAAAAAAAADUdqOCWzOrCtHVI2GtiRXUlUidKJ3cve1e1CneU2C6Y1e57Rd6Z0FTCvo9OxzV7UXvL5GnbU8AtedWVaepRIK+FFWlq0b0o17l72r2oR97ZKsudH5vcuuimlUsLn8PcPOk/8A1fFdnFeK7aVAy2W47dsXvU1pvFM6CojXgv3ZG9jmr2opiSuyi4vJm7KVWFWCnTeaetNAAHB2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAyONWS5ZFeae0WmmdUVU7tGtTqana5V7ETtU5xmxXPI7zBabRSuqKqZdEanU1O1zl7ETvLfbJtnltwSz83Hu1FznantVUqcXL+Fvc1Pj1qZlpaSuJdhWdJNJKODUclrqvYvq+z39u7ZVgduwWwpSQbs1fMiOq6rTjI7uTuanYhuABZYQjCKjFajRF1dVbutKtWlnKW1gAH0Y4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABrG0XCLNm9mWhuce5MxFWnqmJ04XeHenenaVDz/DL1hd5db7tB0HKqwVDE/VzN70X5p1oXjMTleO2jKLPLarzSMqKeTq14OY7sc1exTBu7KNdZrVItujWlVbCJdFU61J7VvXavtsZQ8Eg7WNl14wiqdUsR9dZnu/VVTW8WdzZE7F8epfgR8V2pTlTlzZLJm7rK9oXtFVqEudF/wC/BgAHwZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM5hWK3jL71Ha7PTLJIvGSReDIm/icvYnzMzsv2cXvOa9PZmLS22N2k9Y9vRb4N/E7w95bXCcUs2IWZlss1MkbE4ySO4ySu/E5e1fkZ9nYyrPnS1RKbpLpbRwqLo0etV4bo9r+xjdmOA2jBbP7NRNSatlRFqqtzelIvcnc1OxDbgCxQhGEebFajSdzdVbqrKtWlzpPa2AAfR0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHVV08FXTSU1VDHPBK1WyRyNRzXIvWiopXfa5sNmplmvOFxumg4ult+ur2d6xr2p+Xr7tSxoOivbwrxykiXwjG7vCavSW8tT2p7H3/fafPuWN8Ujo5WOY9q6Oa5NFRe5UPyXC2o7J7Dmkb6yJrbdd9OjVRt4SL3SN7fPrKvZxhmQYdcFpL1ROjaqrzU7OlFKne1306yvXNnUoPN61xN1YFpRZ4vFRi+bU3xe3w4r14o14AGIWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGbw/Fb7llySgslBJUP16b+qONO9zupDmMXJ5I661anRg6lSSUVtb1IwjUVyo1qKqrwRE7Sa9kexGtvCw3jLWS0VvXR0dJ+zLMn5vwN+K+BJmyzY7ZMSSK4XLcul4Tikr2/q4V/I1e38y8fIk8mrXDcutV8vuas0h07c86GHalvnv/wDzw79vDiee20NHbKGKht9NFTU0Ld2OKNu61qeR6ACYSyNZSk5NuTzbAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADx3i12+8W+S33Sjhq6WVNHxyt1Rf9F8T2A4aT1M+oTlCSlF5NFc9pWwKop1luOGSrURcXLQTO6bf4HL1+S8fFSDK+jq7fVyUldTS01RGuj4pWK1zV8UUv+a5muE43l9JzN6t0csiJpHUM6Msfk5PkvAi7jDIz61PU/Q2Fgmn1e3ypXy58f3L5l38fR9rKOAmDP8AYRkNmWSrx6T7Zok482ibs7E/h6nenHwIjqYJ6ad8FTDJDKxdHskarXNXuVFIarRnSeU1kbRw/FLTEafPtpqS9V3rajrAB1EgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADsp4JqmdkFPDJNK9dGsY1XOcvciJ1g4bSWbOs7aOmqaypjpqSCWonkXdZHG1XOcvciISzgOwnI70sdVf3/YtEui7jk3p3p4N6m+vuLBYRgmM4fTJHZrexsypo+pk6cz/Ny9XkmiEhb4dVq65akU3GNNrCwzhRfST7Ni739syEdm2wSvrliuGYSuoaddHJRRL+ten5l6m+Sar5FhLBZbVYbdHb7PQw0dMzqZG3TVe9V61XxUyAJuha06C6qNT4vj97i087iXV3RWpLw+r1gAGQQoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANczHB8YyyBWXq1QzS6aNnYm5K3ycnH0XgbGD5lFSWUlmd1C4q281UpScZLenkytma8nq6UqvqcWuDK+LrSmqVRkqeCO/ZX10Iev1hvNhqlpbzbKqhlReqaNURfJepfQvoea5W+huVK6luFHBVwO/ajmjR7V9FI2thdOWuDyLzhnKBe2+ULqKqLjsl9n5eJQIFr8r2D4bdlfLbPaLNO7j+odvR6/wO+ioRTk+wTMrYrpLY6lvEKdXNP5uTT+F30VSNq4fXp7s+4vlhplhV5kuk5j4S1euz1ImBkbzYrzZZliu1qrKJ6LppNC5qL5KvBTHGG008mWeFSNSPOg812AAHB9gAAAAAAAAAAAAAAAAAAAAAGUseO36+SpHaLRW1rl7YYVciea9SEk4zsBy+47sl2mpLRCvFUe7nZP7reHxO2nQqVPljmRt7jFjYr/mKqj2Z6/LaREZPH8fveQVSU1mtdVXSa6LzUaqjfNepPUtBimwrC7OrJbhHPeahvHWpdpHr/A3h79STKCio7fTNpqGlgpYGpo2OGNGNT0QkaWFTeuo8ilYjyiW1PONnTcnxepeW1+hXTC+T1cqlWVGVXJlFH1rTU2j5F8Fd+ynpqTfh+D4xicKMstqhhl00dO9N+V3m5ePonA2MEpRtKVH5VrNe4ppHiOJ5qvU6v7VqXlv8cwADJIMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA66mngqYlhqYI5o3dbJGo5F9FNMv2yjAbyrnT4/T08jv8AiUqrCvubw+Bu4PidOE9UlmZNte3Fq+dQqOL7G17EHXrk52SZXOtF+raRexk8bZW+9N1TTbtyesvp9VoK+2VzexN90bl9FTT4lowYs8OoS3ZFjttNcYoanU5y7Un66n6lMrlsj2hUKrv43UTIn3oHsk+S6mvV2LZLQqqVeP3SDTr36V6J8i9wMaWE03skyao8o95H+LRi+7Nfc+fssE8S6SwyMX8zVQ6z6AT0lLOmk1NDKn540X5ngmxrHJ/31gtUv8dHGvzQ6nhD3S9CQhykw/Xbvwl/YocC9DsKw1y6uxKwO87dD/6T8/oPhX/0fj3/APNh/wDSfP4TP9yO7/iRbf8A0S80UZBelmGYexdWYpYm+VuiT/KeqDHrBB+4sdsi/gpGJ8kOVhEt8j5lyk0P00H5r7FEoaWpmXSGnmkVexrFUytDiOU1yolJjt1m16lbSP09+heeKnp4U0igijT8rEQ7DsjhC3y9DDq8pNR/w7dLvln9EU1tux/aHXKm7j0sDV7aiVkfwVdTarTyeMqqNFuN0tlE3tRqulcnuRE+JaAHdHC6K25sirjlAxSpqgox7ln7t+xCVl5OuPwK112vdfWqnW2JrYmr81N7sOy7BLKrXUuO0ssjeqSpRZnf4tUNyBlQtaMPliiv3ekOJ3eqrXllwTyXkskfiCKKCNIoYmRMb1NY1ERPRD9gGQQzeetgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH//2Q==" alt="UPC" style="width:38px;height:38px;object-fit:contain;flex-shrink:0;filter:brightness(0) invert(1);">
+    <div class="logo-text">Matrícula<span>Inteligente · 2025-I</span></div>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-ava">SK</div>
+    <div class="user-info">
+      <div class="name">Sofía Kami</div>
+      <div class="code">U202118745 · Com. y Marketing</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <button class="nav-item active" onclick="showPanel('wizard')" id="nav-wizard">
+      <span class="nav-icon">✨</span> Generar Horario
+    </button>
+    <button class="nav-item" onclick="showPanel('schedule')" id="nav-schedule">
+      <span class="nav-icon">📅</span> Mi Horario
+    </button>
+    <div class="nav-section-label">Información</div>
+    <button class="nav-item" onclick="showPanel('professors')" id="nav-professors">
+      <span class="nav-icon">👨‍🏫</span> Docentes
+    </button>
+    <button class="nav-item" onclick="showPanel('progress')" id="nav-progress">
+      <span class="nav-icon">📈</span> Progreso Académico
+    </button>
+    <div class="nav-section-label">Gestión</div>
+    <button class="nav-item" onclick="showPanel('waitlist')" id="nav-waitlist">
+      <span class="nav-icon">🔔</span> Lista de Espera
+      <span class="nav-badge">2</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('alerts')" id="nav-alerts">
+      <span class="nav-icon">💬</span> Notificaciones
+      <span class="nav-badge" id="alerts-badge">3</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('request')" id="nav-request">
+      <span class="nav-icon">📋</span> Solicitar Sección
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="semester-badge">
+      <div class="sem">Período activo</div>
+      <div class="val">2025 – Ciclo I</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-area">
+<!-- WIZARD PANEL -->
+  <div class="panel active" id="panel-wizard">
+    <div class="wizard-wrap">
+      <!-- Hero -->
+      <div class="wizard-hero">
+        <div class="wizard-hero-title">Tu horario <span class="accent">ideal</span>,<br>generado por IA</div>
+        <div class="wizard-hero-sub">Responde estas preguntas y el sistema creará el mejor horario posible respetando tus restricciones.</div>
+        <div class="wizard-steps-indicator" id="wizard-steps-ui">
+          <div class="ws-step active" id="wsi-0"><div class="ws-dot">1</div> Cursos</div>
+          <div class="ws-line" id="wsl-0"></div>
+          <div class="ws-step" id="wsi-elec"><div class="ws-dot">2</div> Electivos</div>
+          <div class="ws-line" id="wsl-elec"></div>
+          <div class="ws-step" id="wsi-1"><div class="ws-dot">3</div> Turno</div>
+          <div class="ws-line" id="wsl-1"></div>
+          <div class="ws-step" id="wsi-2"><div class="ws-dot">4</div> Días libres</div>
+          <div class="ws-line" id="wsl-2"></div>
+          <div class="ws-step" id="wsi-3"><div class="ws-dot">5</div> Preferencias</div>
+          <div class="ws-line" id="wsl-3"></div>
+          <div class="ws-step" id="wsi-4"><div class="ws-dot">6</div> Carga</div>
+        </div>
+      </div>
+
+      <!-- Error Card -->
+      <div class="error-card" id="error-card">
+        <div class="err-title">⚠️ No se pudo generar un horario</div>
+        <div class="err-sub" id="error-msg">No se pudo generar un horario con esas condiciones. Intenta ajustar tus preferencias.</div>
+      </div>
+
+      <!-- Wizard Card -->
+      <div class="wizard-card">
+        <!-- STEP 1: Courses -->
+        <div class="wizard-step active" id="step-0">
+          <div class="step-title">¿Qué cursos deseas matricularte?</div>
+          <div class="step-sub">Se te permiten máximo <strong>27 créditos</strong>. Selecciona los cursos que deseas matricularte.</div>
+          <div class="courses-grid" id="course-grid"></div>
+          <div class="btn-row">
+            <div style="font-size:11.5px;color:var(--gray-500);" id="course-count">0 cursos · 0 créditos seleccionados</div>
+            <button class="btn btn-primary" onclick="wizardNext(0)">Siguiente →</button>
+          </div>
+        </div>
+
+        <!-- STEP 1b: Electivos -->
+        <div class="wizard-step" id="step-elec">
+          <div class="step-title">¿Deseas llevar electivos este semestre?</div>
+          <div class="step-sub">Los electivos complementan tu formación. Elige el tipo de electivo que te interesa.</div>
+          <div style="font-size:12px;color:var(--gray-500);background:var(--blue-bg);border-radius:var(--r-xs);padding:8px 12px;margin-bottom:14px;">
+            💡 Puedes seleccionar <strong>Mención, Coursera o ambas</strong> a la vez. Haz clic para activar/desactivar cada opción.
+          </div>
+          <div class="elec-type-row" style="display:flex;gap:14px;margin-bottom:22px;">
+            <div class="elec-type-card" id="elec-card-mencion" onclick="toggleElecType('mencion',this)" style="flex:1;border:2px solid var(--gray-200);border-radius:var(--r-sm);padding:18px 16px;cursor:pointer;transition:all var(--transition);background:var(--white);text-align:center;">
+              <div style="font-size:28px;margin-bottom:8px;">🎓</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:3px;">Mención</div>
+              <div style="font-size:11px;color:var(--gray-500);">Cursos especializados de tu carrera</div>
+            </div>
+            <div class="elec-type-card" id="elec-card-coursera" onclick="toggleElecType('coursera',this)" style="flex:1;border:2px solid var(--gray-200);border-radius:var(--r-sm);padding:18px 16px;cursor:pointer;transition:all var(--transition);background:var(--white);text-align:center;">
+              <div style="font-size:28px;margin-bottom:8px;">💻</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:3px;">Coursera (ISC)</div>
+              <div style="font-size:11px;color:var(--gray-500);">Cursos en línea certificados</div>
+            </div>
+            <div class="elec-type-card" id="elec-card-none" onclick="toggleElecType('none',this)" style="flex:1;border:2px solid var(--gray-200);border-radius:var(--r-sm);padding:18px 16px;cursor:pointer;transition:all var(--transition);background:var(--white);text-align:center;">
+              <div style="font-size:28px;margin-bottom:8px;">⏭️</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:3px;">No por ahora</div>
+              <div style="font-size:11px;color:var(--gray-500);">Omitir electivos este semestre</div>
+            </div>
+          </div>
+
+          <!-- Mención list (hidden by default) -->
+          <div id="mencion-section" style="display:none;">
+            <div style="font-size:12.5px;font-weight:600;margin-bottom:12px;color:var(--gray-700);">Menciones disponibles – selecciona la(s) que te interesen:</div>
+            <div id="mencion-list" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
+          </div>
+
+          <!-- Coursera list (hidden by default) -->
+          <div id="coursera-section" style="display:none;">
+            <div style="font-size:12.5px;font-weight:600;margin-bottom:6px;color:var(--gray-700);">Cursos ISC disponibles — selecciona los que deseas:</div>
+            <div style="font-size:11px;color:var(--purple);background:var(--purple-bg);padding:7px 11px;border-radius:var(--r-xs);margin-bottom:12px;">🟣 Todos son virtuales y se asignan exclusivamente el <strong>domingo</strong>.</div>
+            <div id="coursera-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+            <div class="coursera-multi-total" id="coursera-multi-total"></div>
+          </div>
+
+          <!-- Course description panel -->
+          <div id="elec-desc-panel" style="display:none;background:var(--blue-bg);border:1.5px solid #BFDBFE;border-radius:var(--r-sm);padding:16px;margin-top:14px;">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--navy);" id="elec-desc-title"></div>
+            <div style="font-size:12px;color:var(--gray-700);line-height:1.65;" id="elec-desc-body"></div>
+          </div>
+
+          <div class="btn-row" style="margin-top:20px;">
+            <button class="btn btn-secondary" onclick="gotoStep(0)">← Atrás</button>
+            <button class="btn btn-primary" onclick="gotoStep(1)">Siguiente →</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Turno -->
+        <div class="wizard-step" id="step-1">
+          <div class="step-title">¿En qué turno prefieres estudiar?</div>
+          <div class="step-sub">Puedes seleccionar <strong>uno o más turnos</strong>. Las clases se asignarán dentro de los horarios elegidos.</div>
+          <div class="turno-grid">
+            <div class="turno-card" onclick="pickTurno('mañana',this)">
+              <div class="tc-icon">🌅</div>
+              <div class="tc-label">Mañana</div>
+              <div class="tc-range">07:00 – 12:00</div>
+              <div class="tc-blocks">
+                <span class="tc-block">07:00</span><span class="tc-block">08:00</span>
+                <span class="tc-block">09:00</span><span class="tc-block">10:00</span>
+                <span class="tc-block">11:00</span>
+              </div>
+            </div>
+            <div class="turno-card" onclick="pickTurno('tarde',this)">
+              <div class="tc-icon">☀️</div>
+              <div class="tc-label">Tarde</div>
+              <div class="tc-range">12:00 – 18:00</div>
+              <div class="tc-blocks">
+                <span class="tc-block">12:00</span><span class="tc-block">13:00</span>
+                <span class="tc-block">14:00</span><span class="tc-block">15:00</span>
+                <span class="tc-block">16:00</span><span class="tc-block">17:00</span>
+              </div>
+            </div>
+            <div class="turno-card" onclick="pickTurno('noche',this)">
+              <div class="tc-icon">🌙</div>
+              <div class="tc-label">Noche</div>
+              <div class="tc-range">18:00 – 22:00</div>
+              <div class="tc-blocks">
+                <span class="tc-block">18:00</span><span class="tc-block">19:00</span>
+                <span class="tc-block">20:00</span><span class="tc-block">21:00</span>
+              </div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="gotoStep('elec')">← Atrás</button>
+            <button class="btn btn-primary" onclick="wizardNext(1)">Siguiente →</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Free days -->
+        <div class="wizard-step" id="step-2">
+          <div class="step-title">¿Qué días prefieres tener libres?</div>
+          <div class="step-sub">No se asignarán clases en los días marcados</div>
+          <div class="days-row" id="days-row">
+            <button class="day-chip" onclick="toggleFreeDay('Lun',this)">Lunes</button>
+            <button class="day-chip" onclick="toggleFreeDay('Mar',this)">Martes</button>
+            <button class="day-chip" onclick="toggleFreeDay('Mié',this)">Miércoles</button>
+            <button class="day-chip" onclick="toggleFreeDay('Jue',this)">Jueves</button>
+            <button class="day-chip" onclick="toggleFreeDay('Vie',this)">Viernes</button>
+            <button class="day-chip" onclick="toggleFreeDay('Sáb',this)">Sábado</button>
+          </div>
+          <p style="font-size:11.5px;color:var(--gray-500);margin-bottom:20px;">Deja todo sin marcar si no necesitas días libres</p>
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="wizardPrev(2)">← Atrás</button>
+            <button class="btn btn-primary" onclick="wizardNext(2)">Siguiente →</button>
+          </div>
+        </div>
+
+        <!-- STEP 4: Preferences -->
+        <div class="wizard-step" id="step-3">
+          <div class="step-title">Preferencias adicionales</div>
+          <div class="step-sub">Ajusta las opciones según tu estilo de vida</div>
+          <div class="pref-list">
+            <div class="pref-item">
+              <div>
+                <div class="pref-label">🚫 Evitar clases en la mañana</div>
+                <div class="pref-sub">No asignar bloques antes de las 12:00</div>
+              </div>
+              <button class="toggle" id="tog-avoidmorn" onclick="this.classList.toggle('on')"></button>
+            </div>
+            <div class="pref-item">
+              <div>
+                <div class="pref-label">⚡ Dejar huecos entre clases</div>
+                <div class="pref-sub">Al menos un bloque libre entre cursos</div>
+              </div>
+              <button class="toggle" id="tog-gaps"></button>
+            </div>
+            <!-- Gap hours sub-panel -->
+            <div class="gap-sub-panel" id="gap-sub-panel">
+              <span class="gap-label">⏱️ Horas de hueco entre clases:</span>
+              <div class="gap-stepper">
+                <button class="gap-btn" id="gap-minus">−</button>
+                <span class="gap-val" id="gap-val">1</span>
+                <span class="gap-unit">h</span>
+                <button class="gap-btn" id="gap-plus">+</button>
+              </div>
+            </div>
+            <div class="pref-item">
+              <div>
+                <div class="pref-label">💼 Tengo trabajo u otras actividades</div>
+                <div class="pref-sub">El sistema filtrará cursos según tu horario laboral</div>
+              </div>
+              <button class="toggle" id="tog-work" onclick="toggleWorkPref(this)"></button>
+            </div>
+          </div>
+
+          <!-- Work hours selector (hidden until toggle is on) -->
+          <div id="work-hours-panel" style="display:none;margin-top:14px;background:var(--orange-bg);border:1.5px solid #FDE68A;border-radius:var(--r-sm);padding:18px 20px;">
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px;color:#92400E;">⏰ ¿En qué horarios realizas tus actividades?</div>
+            <div style="font-size:11.5px;color:#78350F;margin-bottom:14px;">Selecciona los rangos en los que <strong>no puedes asistir a clases</strong>. Puedes elegir múltiples.</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="work-hours-grid">
+              <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:white;border-radius:var(--r-xs);border:1.5px solid #FDE68A;cursor:pointer;font-size:12px;font-weight:500;">
+                <input type="checkbox" value="07:00-09:00" onchange="updateWorkHours(this)" style="accent-color:var(--orange);"> 🌅 07:00 – 09:00
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:white;border-radius:var(--r-xs);border:1.5px solid #FDE68A;cursor:pointer;font-size:12px;font-weight:500;">
+                <input type="checkbox" value="09:00-11:00" onchange="updateWorkHours(this)" style="accent-color:var(--orange);"> 🌄 09:00 – 11:00
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:white;border-radius:var(--r-xs);border:1.5px solid #FDE68A;cursor:pointer;font-size:12px;font-weight:500;">
+                <input type="checkbox" value="11:00-13:00" onchange="updateWorkHours(this)" style="accent-color:var(--orange);"> ☀️ 11:00 – 13:00
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:white;border-radius:var(--r-xs);border:1.5px solid #FDE68A;cursor:pointer;font-size:12px;font-weight:500;">
+                <input type="checkbox" value="13:00-15:00" onchange="updateWorkHours(this)" style="accent-color:var(--orange);"> 🌞 13:00 – 15:00
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:white;border-radius:var(--r-xs);border:1.5px solid #FDE68A;cursor:pointer;font-size:12px;font-weight:500;">
+                <input type="checkbox" value="15:00-17:00" onchange="updateWorkHours(this)" style="accent-color:var(--orange);"> 🌤️ 15:00 – 17:00
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:white;border-radius:var(--r-xs);border:1.5px solid #FDE68A;cursor:pointer;font-size:12px;font-weight:500;">
+                <input type="checkbox" value="17:00-19:00" onchange="updateWorkHours(this)" style="accent-color:var(--orange);"> 🌆 17:00 – 19:00
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:white;border-radius:var(--r-xs);border:1.5px solid #FDE68A;cursor:pointer;font-size:12px;font-weight:500;">
+                <input type="checkbox" value="19:00-21:00" onchange="updateWorkHours(this)" style="accent-color:var(--orange);"> 🌙 19:00 – 21:00
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:white;border-radius:var(--r-xs);border:1.5px solid #FDE68A;cursor:pointer;font-size:12px;font-weight:500;">
+                <input type="checkbox" value="21:00-23:00" onchange="updateWorkHours(this)" style="accent-color:var(--orange);"> 🌑 21:00 – 23:00
+              </label>
+            </div>
+            <div id="work-hours-summary" style="margin-top:10px;font-size:11.5px;color:#92400E;font-weight:600;"></div>
+          </div>
+
+          <div class="btn-row" style="margin-top:18px;">
+            <button class="btn btn-secondary" onclick="wizardPrev(3)">← Atrás</button>
+            <button class="btn btn-primary" onclick="wizardNext(3)">Siguiente →</button>
+          </div>
+        </div>
+
+        <!-- STEP 5: Load -->
+        <div class="wizard-step" id="step-4">
+          <div class="step-title">¿Cuál es tu carga académica deseada?</div>
+          <div class="step-sub">Esto afecta cómo se distribuyen los cursos durante la semana</div>
+          <div class="load-grid">
+            <div class="load-card" onclick="pickLoad('ligera',this)">
+              <div class="lc-icon">🌿</div>
+              <div class="lc-label">Ligera</div>
+              <div class="lc-sub">Más días, menos carga diaria</div>
+            </div>
+            <div class="load-card" onclick="pickLoad('media',this)">
+              <div class="lc-icon">⚖️</div>
+              <div class="lc-label">Media</div>
+              <div class="lc-sub">Balance entre días y horas</div>
+            </div>
+            <div class="load-card" onclick="pickLoad('alta',this)">
+              <div class="lc-icon">🔥</div>
+              <div class="lc-label">Alta</div>
+              <div class="lc-sub">Comprimir clases en pocos días</div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="wizardPrev(4)">← Atrás</button>
+            <button class="btn btn-primary" onclick="generateSchedule()">✨ Generar mi horario</button>
+          </div>
+        </div>
+
+        <!-- GENERATING STEP -->
+        <div class="wizard-step" id="step-gen">
+          <div class="generating-wrap" style="margin:0 auto;">
+            <div class="gen-icon">⚙️</div>
+            <div class="gen-title">Generando tu horario ideal</div>
+            <div class="gen-sub">El motor de IA analiza todas tus restricciones</div>
+            <div class="gen-steps" id="gen-steps">
+              <div class="gen-step" id="gs-0"><span class="gen-step-icon">⏳</span> Analizando cursos seleccionados...</div>
+              <div class="gen-step" id="gs-1"><span class="gen-step-icon">⏳</span> Aplicando turno y restricciones de tiempo...</div>
+              <div class="gen-step" id="gs-2"><span class="gen-step-icon">⏳</span> Verificando días libres...</div>
+              <div class="gen-step" id="gs-3"><span class="gen-step-icon">⏳</span> Optimizando carga académica...</div>
+              <div class="gen-step" id="gs-4"><span class="gen-step-icon">⏳</span> Eliminando cruces de horario...</div>
+              <div class="gen-step" id="gs-5"><span class="gen-step-icon">⏳</span> Asignando mejores docentes...</div>
+            </div>
+            <div class="gen-bar" style="margin-top:18px;width:100%;"><div class="gen-bar-fill" id="gen-bar-fill"></div></div>
+          </div>
+        </div>
+
+        <!-- CARGA SUCCESS STEP -->
+        <div class="wizard-step" id="step-carga-done">
+          <div class="generating-wrap" style="margin:0 auto;padding:40px 24px;">
+            <div style="width:72px;height:72px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:22px;">✅</div>
+            <div class="gen-title" style="color:var(--green);">¡Recomendación cargada!</div>
+            <div style="font-size:13.5px;color:var(--gray-600);margin:10px 0 28px;text-align:center;line-height:1.6;">Tu recomendación de horario ha sido cargada.<br>Por favor dirígete a <strong>"Horario"</strong> para visualizarla.</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+              <button class="btn btn-primary" style="padding:13px 28px;font-size:14px;" onclick="showPanel('schedule')">📅 Ver mi Horario →</button>
+              <button class="btn btn-outline" style="padding:13px 28px;font-size:14px;" onclick="resetWizard();showPanel('wizard')">🔄 Volver al inicio</button>
+            </div>
+            <button style="margin-top:14px;background:none;border:none;font-size:12px;color:var(--gray-400);cursor:pointer;text-decoration:underline;" onclick="gotoStep(4)">← Retroceder al paso anterior</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE PANEL -->
+  <div class="panel" id="panel-schedule">
+    <div class="schedule-wrap">
+      <div class="schedule-header">
+        <div class="schedule-title-area">
+          <div class="page-title">📅 Mi Horario</div>
+          <div class="page-sub" id="sched-subtitle">Semestre 2025-I · Generado por IA</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div class="score-badge">
+            <svg class="prog-circle" style="width:48px;height:48px;position:relative;" viewBox="0 0 48 48">
+              <circle cx="24" cy="24" r="20" fill="none" stroke="#E5E7EB" stroke-width="4"/>
+              <circle cx="24" cy="24" r="20" fill="none" stroke="#10B981" stroke-width="4"
+                stroke-dasharray="125.66" stroke-dashoffset="125.66" id="score-circle-arc"
+                stroke-linecap="round" style="transition:stroke-dashoffset 1s ease;transform-origin:center;transform:rotate(-90deg) translate(-48px,0)"/>
+            </svg>
+            <div class="score-info">
+              <div class="score-val" id="score-display">—</div>
+              <div class="score-label">Puntuación IA</div>
+            </div>
+          </div>
+          <button class="btn btn-outline" onclick="showPanel('wizard');resetWizard()">🔄 Regenerar</button>
+          <button class="btn btn-primary" onclick="confirmEnrollment()">✅ Confirmar matrícula</button>
+        </div>
+      </div>
+
+      <div id="no-schedule-msg" class="empty-schedule">
+        <div class="empty-icon">📅</div>
+        <div>Aún no has generado un horario.</div>
+        <button class="btn btn-primary" onclick="showPanel('wizard')">Generar mi horario →</button>
+      </div>
+
+      <div id="schedule-content" style="display:none;">
+        <div class="sched-edit-bar" id="sched-edit-bar">
+          <span class="sched-edit-title">✏️ Edición en vivo — los cambios recalculan el horario al instante</span>
+          <span class="sched-credit-pill" id="live-credit-pill">0 / 27 cr</span>
+          <button class="sched-add-btn" id="sched-add-btn">➕ Agregar curso</button>
+        </div>
+        <div class="regen-strip" id="regen-strip" style="display:none;">
+          <div class="regen-text">⚡ Horario regenerado con nuevas preferencias</div>
+          <button class="btn btn-secondary" style="font-size:11px;padding:6px 12px;" onclick="document.getElementById('regen-strip').style.display='none'">Cerrar</button>
+        </div>
+        <div class="schedule-layout">
+          <div>
+            <div class="sunday-note" id="sunday-note">🟣 Los cursos Coursera ISC aparecen el <strong>Domingo</strong> (virtual). No afectan el horario semanal.</div>
+            <div class="week-grid-full" id="week-grid-full"></div>
+          </div>
+          <div class="schedule-sidebar">
+            <div class="sched-card">
+              <div class="sched-card-title">📊 Resumen</div>
+              <div class="stats-row" id="stats-row"></div>
+            </div>
+            <div class="sched-card">
+              <div class="sched-card-title">🤖 Explicación IA</div>
+              <div class="explanation-text" id="explanation-text"></div>
+              <div style="margin-top:10px;" id="explanation-tags"></div>
+            </div>
+            <div class="sched-card">
+              <div class="sched-card-title">📚 Cursos asignados</div>
+              <div id="course-summary-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFESSORS PANEL -->
+  <div class="panel" id="panel-professors">
+    <div class="page-header page-header-row">
+      <div>
+        <div class="page-title">👨‍🏫 Docentes</div>
+        <div class="page-sub">Profesores asignados a tus cursos este semestre</div>
+      </div>
+    </div>
+    <div class="prof-grid" id="prof-grid"></div>
+  </div>
+
+  <!-- PROGRESS PANEL -->
+  <div class="panel" id="panel-progress">
+    <div class="progress-wrap">
+      <div class="prog-hero">
+        <div class="prog-hero-text">
+          <h2>¡Vas al 70%, Sofía! 🎉</h2>
+          <p>Llevas 126 créditos aprobados de 180 requeridos</p>
+          <div style="margin-top:16px;">
+            <div style="font-size:10.5px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Avance de carrera</div>
+            <div style="background:rgba(255,255,255,0.1);border-radius:20px;height:8px;overflow:hidden;">
+              <div style="height:100%;background:var(--red-light);border-radius:20px;width:0;transition:width 1.2s ease;" id="prog-bar-hero"></div>
+            </div>
+          </div>
+        </div>
+        <div style="position:relative;width:100px;height:100px;flex-shrink:0;">
+          <svg viewBox="0 0 100 100" width="100" height="100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="8"/>
+            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--red-light)" stroke-width="8"
+              stroke-dasharray="263.9" stroke-dashoffset="79.2" stroke-linecap="round"
+              transform="rotate(-90 50 50)"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;font-weight:900;font-family:'Sora',sans-serif;">70%</div>
+        </div>
+      </div>
+      <div class="prog-stats">
+        <div class="prog-stat-card">
+          <div class="label">Créditos aprobados</div>
+          <div class="value">126</div>
+          <div class="sub">de 180 requeridos</div>
+          <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:0" id="pb1"></div></div>
+        </div>
+        <div class="prog-stat-card">
+          <div class="label">Ciclos completados</div>
+          <div class="value">7</div>
+          <div class="sub">de 10 ciclos</div>
+          <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:0" id="pb2"></div></div>
+        </div>
+        <div class="prog-stat-card">
+          <div class="label">Promedio acumulado</div>
+          <div class="value">15.4</div>
+          <div class="sub">Escala vigesimal</div>
+          <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:0;background:var(--green)" id="pb3"></div></div>
+        </div>
+        <div class="prog-stat-card">
+          <div class="label">Cursos pendientes</div>
+          <div class="value">18</div>
+          <div class="sub">aprox. 3 ciclos</div>
+          <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:0;background:var(--orange)" id="pb4"></div></div>
+        </div>
+      </div>
+      <div class="page-header"><div class="page-title" style="font-size:15px;">Ciclos del Plan de Estudios</div></div>
+      <div class="ciclos-grid" id="ciclos-grid"></div>
+    </div>
+  </div>
+
+  <!-- WAITLIST PANEL -->
+  <div class="panel" id="panel-waitlist">
+    <div class="waitlist-wrap">
+      <div class="page-header">
+        <div class="page-title">🔔 Lista de Espera</div>
+        <div class="page-sub">Administra tus posiciones en listas de espera</div>
+      </div>
+      <div class="wl-header">
+        <div>
+          <div class="wl-pos" id="wl-pos-num">3</div>
+          <div class="wl-pos-sub">Posición en Marketing Avanzado Sec. 02</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--gray-500);margin-bottom:8px;text-align:right;">Personas delante de ti</div>
+          <div class="wl-queue" id="wl-queue">
+            <div class="wl-person">👤</div>
+            <div class="wl-person">👤</div>
+            <div class="wl-person">👤</div>
+            <div class="wl-person you">TÚ</div>
+            <div class="wl-person">👤</div>
+            <div class="wl-person">👤</div>
+          </div>
+        </div>
+      </div>
+      <div class="wl-courses">
+        <div class="wl-item">
+          <div class="wl-icon">🌐</div>
+          <div class="wl-info">
+            <div class="wl-name">Marketing Avanzado</div>
+            <div class="wl-sub">Sec. 02 · Prof. R. Vargas · Lun/Mié 14:00-16:00</div>
+          </div>
+          <div class="wl-chip" id="wl-chip-1">Posición #<span id="wl-p1">3</span></div>
+        </div>
+        <div class="wl-item">
+          <div class="wl-icon">💰</div>
+          <div class="wl-info">
+            <div class="wl-name">Finanzas Corporativas</div>
+            <div class="wl-sub">Sec. 01 · Prof. M. Torres · Mar/Jue 10:00-12:00</div>
+          </div>
+          <div class="wl-chip" id="wl-chip-2">Posición #<span id="wl-p2">7</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:20px;">
+        <button class="wl-advance-btn" onclick="advanceWaitlist()">⬆️ Simular avance en lista</button>
+        <button class="btn btn-secondary" onclick="showPanel('request')">📋 Solicitar nueva sección</button>
+      </div>
+      <div class="demand-section">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:700;">📊 Demanda por nuevas secciones</div>
+            <div style="font-size:11.5px;color:var(--gray-500);margin-top:2px;">Marketing Avanzado tiene alta demanda</div>
+          </div>
+          <div style="font-size:20px;font-weight:900;font-family:'Sora',sans-serif;color:var(--red);" id="demand-num">47</div>
+        </div>
+        <div class="demand-bar-outer"><div class="demand-bar-inner" style="width:0;" id="demand-bar"></div></div>
+        <div style="font-size:10.5px;color:var(--gray-500);text-align:right;" id="demand-label">62% de probabilidad de apertura</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTS PANEL -->
+  <div class="panel" id="panel-alerts">
+    <div class="page-header page-header-row">
+      <div>
+        <div class="page-title">💬 Notificaciones</div>
+        <div class="page-sub">Alertas y actualizaciones del sistema</div>
+      </div>
+      <button class="btn btn-secondary" onclick="markAllRead()">✓ Marcar todas como leídas</button>
+    </div>
+    <div class="alerts-list" id="alerts-list"></div>
+  </div>
+
+  <!-- REQUEST PANEL -->
+  <div class="panel" id="panel-request">
+    <div style="max-width:600px;">
+      <div class="page-header">
+        <div class="page-title">📋 Solicitar Nueva Sección</div>
+        <div class="page-sub">Registra tu solicitud de apertura de sección adicional</div>
+      </div>
+      <div class="req-form">
+        <div class="form-row">
+          <label class="form-label">Curso</label>
+          <select class="form-select" id="req-course">
+            <option>Marketing Avanzado</option>
+            <option>Finanzas Corporativas</option>
+            <option>Investigación de Mercados</option>
+            <option>Plan de Negocios</option>
+            <option>Innovación y Diseño</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Motivo de la solicitud</label>
+          <textarea class="form-input" rows="3" placeholder="Explica por qué necesitas esta sección..."></textarea>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Turno preferido para la nueva sección</label>
+          <select class="form-select" id="req-turno">
+            <option>Mañana (07:00 - 12:00)</option>
+            <option>Tarde (12:00 - 18:00)</option>
+            <option>Noche (18:00 - 22:00)</option>
+          </select>
+        </div>
+        <div class="demand-section" style="margin-top:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:12.5px;font-weight:700;">📊 Indicador de demanda actual</span>
+            <span style="font-size:13px;font-weight:900;color:var(--red);" id="req-demand-num">47 estudiantes</span>
+          </div>
+          <div class="demand-bar-outer"><div class="demand-bar-inner" style="width:62%;" id="req-demand-bar"></div></div>
+          <div style="font-size:10.5px;color:var(--gray-500);margin-top:6px;">Alta demanda · La universidad considera abrir nueva sección</div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:16px;width:100%;padding:13px;" onclick="submitRequest()">Enviar solicitud →</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end main-area -->
+</div><!-- end app-shell -->
+
+<!-- MODAL: Course alternatives -->
+<div class="modal-overlay" id="modal-course" onclick="closeModal('modal-course',event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-course-title">Secciones alternativas</div>
+      <button class="modal-close" onclick="document.getElementById('modal-course').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="modal-course-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toast-icon">✅</span>
+  <span id="toast-msg">Mensaje</span>
+</div>
+
+<!-- CREDIT LIMIT MODAL -->
+<div class="credit-modal-overlay" id="credit-modal-overlay">
+  <div class="credit-modal-box">
+    <div class="credit-modal-header">
+      <div class="credit-modal-title">⚠️ Llegó al límite de créditos permitidos</div>
+      <div class="credit-modal-sub" id="credit-modal-sub">Máximo 27 créditos. Selecciona qué curso(s) deseas eliminar para poder agregar el nuevo.</div>
+    </div>
+    <div class="credit-modal-body" id="credit-modal-body"></div>
+    <div class="credit-modal-footer">
+      <button class="btn btn-secondary" id="credit-modal-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="credit-modal-apply">Confirmar cambio →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD COURSE MODAL -->
+<div class="modal-overlay" id="modal-add-course">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">➕ Agregar curso al horario</div>
+      <button class="modal-close" id="add-course-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:10px;">Selecciona un curso. El horario se recalculará automáticamente.</div>
+      <div style="font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:10px;padding:8px 12px;background:var(--gray-50);border-radius:var(--r-xs);" id="add-modal-credit-bar"></div>
+      <div class="add-course-grid" id="add-course-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════
+//  CENTRALIZED STATE
+// ═══════════════════════════════════════════════════════════════
+const S = {
+  courses: [],          // selected regular course IDs
+  courseraIds: [],      // selected coursera course IDs (multi)
+  mencionIds: [],       // selected mención IDs
+  elecTypes: [],        // 'mencion' | 'coursera' | 'none'
+  turnos: [],           // multi: 'mañana' | 'tarde' | 'noche'
+  freeDays: [],         // 'Lun'..'Sáb'
+  avoidMorning: false,
+  wantGaps: false,
+  gapHours: 1,
+  workActivities: false,
+  workBlockedHours: [],
+  load: null,           // 'ligera' | 'media' | 'alta'
+  schedule: null,       // generated assignments array
+  score: 0,
+  // credit-swap pending
+  _pendingAdd: null,
+  _swapTargets: [],
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════════════════
+const REGULAR_COURSES = [
+  {id:'mat',icon:'📐',name:'Matemática Aplicada',credits:4,duration:2},
+  {id:'eco',icon:'📊',name:'Economía',credits:3,duration:2},
+  {id:'cont',icon:'📒',name:'Contabilidad Financiera',credits:3,duration:2},
+  {id:'mkt',icon:'🌐',name:'Marketing Digital',credits:3,duration:2},
+  {id:'eng',icon:'🗣️',name:'Inglés 5',credits:2,duration:1,isEnglish:true},
+  {id:'inv',icon:'🔍',name:'Investigación de Mercados',credits:3,duration:2},
+  {id:'pln',icon:'💼',name:'Plan de Negocios',credits:4,duration:2},
+  {id:'fin',icon:'💰',name:'Finanzas Corporativas',credits:4,duration:2},
+  {id:'inn',icon:'💡',name:'Innovación y Diseño',credits:3,duration:2},
+];
+const COURSERA_COURSES_DATA = [
+  {id:'crs_sql',icon:'🗄️',name:'ISC SQL básico para ciencia de datos',credits:5,duration:3,
+   desc:'Cuatro micro-cursos de SQL: conceptos básicos, Data Wrangling, análisis SQL y Apache Spark. Desarrolla habilidades prácticas en ciencia de datos.'},
+  {id:'crs_ux',icon:'🎨',name:'ISC Diseño de experiencia e interfaz del usuario',credits:4,duration:2,
+   desc:'Fundamentos de UX/UI: arquitectura de información, wireframes y prototipos de alta fidelidad. Enfocado en diseño centrado en el usuario.'},
+  {id:'crs_mkt',icon:'📈',name:'ISC Analíticas de marketing digital',credits:4,duration:2,
+   desc:'Métricas de marketing digital, SEO, gestión de redes sociales y análisis de rendimiento de campañas.'},
+];
+const PROFESSORS = [
+  {name:'Dr. Ramiro Vásquez',avatar:'RV',color:'#3B82F6',course:'Matemática Aplicada',rating:4.8,tags:['Mejor valorado','Claro','Puntual'],reviews:124,exp:'12 años'},
+  {name:'Mg. Patricia Ríos',avatar:'PR',color:'#10B981',course:'Economía',rating:4.5,tags:['Amena','Casos reales'],reviews:89,exp:'8 años'},
+  {name:'Mg. Carlos Mendoza',avatar:'CM',color:'#8B5CF6',course:'Contabilidad Financiera',rating:4.2,tags:['Exigente','Detallista'],reviews:102,exp:'10 años'},
+  {name:'Mg. Lucia Flores',avatar:'LF',color:'#EC4899',course:'Marketing Digital',rating:4.9,tags:['Mejor valorado','Dinámica','Nueva'],reviews:67,exp:'5 años'},
+  {name:'Prof. Juan Soto',avatar:'JS',color:'#F59E0B',course:'Inglés 5',rating:4.6,tags:['Nativo','Interactivo'],reviews:210,exp:'15 años'},
+  {name:'Dr. Rosa Campos',avatar:'RC',color:'#F97316',course:'Investigación de Mercados',rating:4.3,tags:['Investigadora','Rigurosa'],reviews:78,exp:'9 años'},
+  {name:'Mg. Andres Tello',avatar:'AT',color:'#0EA5E9',course:'Plan de Negocios',rating:4.7,tags:['Empresario','Mejor valorado'],reviews:95,exp:'11 años'},
+  {name:'Dr. Monica Vargas',avatar:'MV',color:'#6366F1',course:'Finanzas Corporativas',rating:4.4,tags:['CFA','Estricta'],reviews:88,exp:'13 años'},
+  {name:'Mg. Diego Paredes',avatar:'DP',color:'#14B8A6',course:'Innovación y Diseño',rating:4.6,tags:['Design Thinking','Creativo'],reviews:71,exp:'6 años'},
+];
+const DAYS_ALL = ['Lun','Mar','Mié','Jue','Vie','Sáb'];
+const DAY_LABEL = {Lun:'Lunes',Mar:'Martes',Mié:'Miércoles',Jue:'Jueves',Vie:'Viernes',Sáb:'Sábado',Dom:'Domingo'};
+const TURNO_BLOCKS = {
+  mañana:['07:00','08:00','09:00','10:00','11:00'],
+  tarde: ['12:00','13:00','14:00','15:00','16:00','17:00'],
+  noche: ['18:00','19:00','20:00','21:00'],
+};
+// Full day 06-23 for grid
+const FULL_HOURS = [];
+for(let h=6;h<=23;h++) FULL_HOURS.push(String(h).padStart(2,'0')+':00');
+const CELL_H = 44; // px per hour slot
+const MAX_CREDITS = 27;
+const COURSERA_SUN_SLOTS = ['09:00','11:00','14:00','16:00'];
+const ENGLISH_PATTERNS = [
+  {days:['Lun','Mié','Vie'],label:'L-X-V'},
+  {days:['Mar','Jue','Sáb'],label:'M-J-S'},
+];
+const COLOR_CLASSES = ['color-0','color-1','color-2','color-3','color-4','color-5'];
+const COURSERA_COLOR = 'color-4';
+
+// ═══════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════
+function qs(sel,root=document){return root.querySelector(sel);}
+function qsa(sel,root=document){return [...root.querySelectorAll(sel)];}
+function incH(t,n=1){const[h,m]=t.split(':').map(Number);return String(h+n).padStart(2,'0')+':'+String(m).padStart(2,'0');}
+function getTotalCredits(courseIds=S.courses, extraCrs=S.courseraIds){
+  const reg = courseIds.reduce((a,id)=>{const c=REGULAR_COURSES.find(x=>x.id===id);return a+(c?c.credits:0);},0);
+  const crs = extraCrs.reduce((a,id)=>{const c=COURSERA_COURSES_DATA.find(x=>x.id===id);return a+(c?c.credits:0);},0);
+  return reg+crs;
+}
+function getAllSelectedIds(){return [...S.courses,...S.courseraIds];}
+function toast(msg,icon='✅'){
+  clearTimeout(toast._t);
+  const t=qs('#toast');const ti=qs('#toast-icon');const tm=qs('#toast-msg');
+  if(!t)return;
+  ti.textContent=icon;tm.textContent=msg;
+  t.classList.add('show');
+  toast._t=setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MOBILE SIDEBAR
+// ═══════════════════════════════════════════════════════════════
+function openSidebar(){
+  qs('.sidebar').classList.add('open');
+  qs('#sidebar-overlay').classList.add('visible');
+}
+function closeSidebar(){
+  qs('.sidebar').classList.remove('open');
+  qs('#sidebar-overlay').classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  WIZARD NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+const STEP_ORDER=[0,'elec',1,2,3,4];
+let wizardStep=0;
+
+function gotoStep(n){
+  const cur=qs('#step-'+wizardStep);if(cur)cur.classList.remove('active');
+  wizardStep=n;
+  const next=qs('#step-'+n);if(next)next.classList.add('active');
+  updateWizardUI();
+}
+function wizardNext(from){
+  if(from===0&&S.courses.length===0){toast('Selecciona al menos un curso','⚠️');return;}
+  if(from===1&&S.turnos.length===0){toast('Selecciona al menos un turno','⚠️');return;}
+  if(from===4){doGenerate();return;}
+  const i=STEP_ORDER.indexOf(from);
+  if(i>=0&&i<STEP_ORDER.length-1)gotoStep(STEP_ORDER[i+1]);
+}
+function wizardPrev(from){
+  const i=STEP_ORDER.indexOf(from);if(i>0)gotoStep(STEP_ORDER[i-1]);
+}
+function updateWizardUI(){
+  const ci=STEP_ORDER.indexOf(wizardStep);
+  [{k:0,l:'Cursos'},{k:'elec',l:'Electivos'},{k:1,l:'Turno'},{k:2,l:'Días libres'},{k:3,l:'Preferencias'},{k:4,l:'Carga'}]
+  .forEach((s,i)=>{
+    const dot=qs('#wsi-'+s.k);const line=qs('#wsl-'+s.k);
+    if(!dot)return;
+    dot.classList.remove('active','done');
+    if(line)line.classList.remove('done');
+    if(i<ci){dot.classList.add('done');qs('.ws-dot',dot).textContent='✓';if(line)line.classList.add('done');}
+    else if(i===ci){dot.classList.add('active');qs('.ws-dot',dot).textContent=i+1;}
+    else qs('.ws-dot',dot).textContent=i+1;
+  });
+}
+function resetWizard(){
+  S.courses=[];S.courseraIds=[];S.mencionIds=[];S.elecTypes=[];S.turnos=[];S.freeDays=[];
+  S.avoidMorning=false;S.wantGaps=false;S.gapHours=1;S.load=null;
+  S.workActivities=false;S.workBlockedHours=[];
+  qs('#step-gen').classList.remove('active');
+  qs('#step-carga-done').classList.remove('active');
+  wizardStep=0;
+  buildCourseGrid();
+  qsa('.turno-card').forEach(c=>c.classList.remove('selected'));
+  qsa('.day-chip').forEach(c=>c.classList.remove('selected'));
+  qsa('.toggle').forEach(t=>t.classList.remove('on'));
+  qsa('.load-card').forEach(c=>c.classList.remove('selected'));
+  qsa('.elec-type-card').forEach(c=>{c.style.borderColor='var(--gray-200)';c.style.background='var(--white)';});
+  qs('#mencion-section').style.display='none';
+  qs('#coursera-section').style.display='none';
+  qs('#elec-desc-panel').style.display='none';
+  qs('#work-hours-panel').style.display='none';
+  qsa('#work-hours-grid input').forEach(cb=>cb.checked=false);
+  qs('#work-hours-summary').textContent='';
+  qs('#error-card').classList.remove('show');
+  qs('#gap-sub-panel').classList.remove('visible');
+  qs('#gap-val').textContent='1';
+  gotoStep(0);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  COURSE GRID (step 0)
+// ═══════════════════════════════════════════════════════════════
+function buildCourseGrid(){
+  const grid=qs('#course-grid');if(!grid)return;
+  grid.innerHTML=REGULAR_COURSES.map(c=>`
+    <div class="course-tile" data-id="${c.id}">
+      <div class="ct-icon">${c.icon}</div>
+      <div class="ct-info">
+        <div class="ct-name">${c.name}</div>
+        <div class="ct-credits">${c.credits} créditos · ${c.duration}h/sesión</div>
+      </div>
+      <div class="ct-check" id="ctc-${c.id}"></div>
+    </div>`).join('');
+  // restore selected state
+  S.courses.forEach(id=>{
+    const t=qs('#course-grid [data-id="'+id+'"]');
+    if(t){t.classList.add('selected');qs('#ctc-'+id).textContent='✓';}
+  });
+  updateCourseCount();
+}
+function toggleCourse(id,skipLimit){
+  const course=REGULAR_COURSES.find(c=>c.id===id);if(!course)return;
+  const idx=S.courses.indexOf(id);
+  if(idx>=0){
+    S.courses.splice(idx,1);
+  } else {
+    const total=getTotalCredits();
+    if(!skipLimit&&total+course.credits>MAX_CREDITS){openCreditModal(id);return;}
+    S.courses.push(id);
+  }
+  refreshCourseGridUI();
+  updateCourseCount();
+  if(S.schedule)liveRecalc();
+}
+function refreshCourseGridUI(){
+  qsa('#course-grid .course-tile').forEach(t=>{
+    const id=t.dataset.id;
+    const sel=S.courses.includes(id);
+    t.classList.toggle('selected',sel);
+    const ch=qs('#ctc-'+id);if(ch)ch.textContent=sel?'✓':'';
+  });
+}
+function updateCourseCount(){
+  const el=qs('#course-count');if(!el)return;
+  const n=S.courses.length;const cr=getTotalCredits();
+  el.textContent=`${n} curso${n!==1?'s':''} · ${cr} créditos seleccionados`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TURNO (multi-select, step 1)
+// ═══════════════════════════════════════════════════════════════
+function pickTurno(t,el){
+  const i=S.turnos.indexOf(t);
+  if(i>=0){S.turnos.splice(i,1);el.classList.remove('selected');}
+  else{S.turnos.push(t);el.classList.add('selected');}
+  if(S.schedule)liveRecalc();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FREE DAYS (step 2)
+// ═══════════════════════════════════════════════════════════════
+function toggleFreeDay(day,el){
+  const i=S.freeDays.indexOf(day);
+  if(i>=0){S.freeDays.splice(i,1);el.classList.remove('selected');}
+  else{S.freeDays.push(day);el.classList.add('selected');}
+  if(S.schedule)liveRecalc();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PREFERENCES (step 3)
+// ═══════════════════════════════════════════════════════════════
+function toggleWorkPref(btn){
+  btn.classList.toggle('on');
+  S.workActivities=btn.classList.contains('on');
+  qs('#work-hours-panel').style.display=S.workActivities?'block':'none';
+  if(!S.workActivities){S.workBlockedHours=[];qsa('#work-hours-grid input').forEach(c=>c.checked=false);qs('#work-hours-summary').textContent='';}
+  if(S.schedule)liveRecalc();
+}
+function updateWorkHours(cb){
+  if(cb.checked){if(!S.workBlockedHours.includes(cb.value))S.workBlockedHours.push(cb.value);}
+  else S.workBlockedHours=S.workBlockedHours.filter(h=>h!==cb.value);
+  qs('#work-hours-summary').textContent=S.workBlockedHours.length?'🚫 Bloqueados: '+S.workBlockedHours.join(', '):'';
+  if(S.schedule)liveRecalc();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LOAD (step 4)
+// ═══════════════════════════════════════════════════════════════
+function pickLoad(l,el){
+  S.load=l;
+  qsa('.load-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  if(S.schedule)liveRecalc();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ELECTIVOS
+// ═══════════════════════════════════════════════════════════════
+function toggleElecType(type,el){
+  if(type==='none'){
+    S.elecTypes=[];
+    qsa('.elec-type-card').forEach(c=>{c.style.borderColor='var(--gray-200)';c.style.background='var(--white)';});
+    el.style.borderColor='var(--red)';el.style.background='var(--red-bg)';
+    qs('#mencion-section').style.display='none';
+    qs('#coursera-section').style.display='none';
+    qs('#elec-desc-panel').style.display='none';
+    return;
+  }
+  const none=qs('#elec-card-none');
+  if(none){none.style.borderColor='var(--gray-200)';none.style.background='var(--white)';}
+  S.elecTypes=S.elecTypes.filter(t=>t!=='none');
+  const i=S.elecTypes.indexOf(type);
+  if(i>=0){S.elecTypes.splice(i,1);el.style.borderColor='var(--gray-200)';el.style.background='var(--white)';}
+  else{S.elecTypes.push(type);el.style.borderColor='var(--red)';el.style.background='var(--red-bg)';}
+  qs('#mencion-section').style.display=S.elecTypes.includes('mencion')?'block':'none';
+  qs('#coursera-section').style.display=S.elecTypes.includes('coursera')?'block':'none';
+  if(!S.elecTypes.includes('coursera')){
+    qs('#elec-desc-panel').style.display='none';
+    // remove coursera courses from state
+    S.courseraIds=[];
+  }
+  if(S.elecTypes.includes('mencion'))buildMencionList();
+  if(S.elecTypes.includes('coursera'))buildCourseraList();
+}
+function selectElecType(t,el){toggleElecType(t,el);}
+
+function buildMencionList(){
+  const list=qs('#mencion-list');if(!list)return;
+  list.innerHTML=(typeof MENCIONES_DATA!=='undefined'?MENCIONES_DATA:[]).map(m=>`
+    <div class="mencion-tile" data-men-id="${m.id}"
+      style="border:2px solid var(--gray-200);border-radius:var(--r-sm);background:var(--white);
+             padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;
+             transition:all var(--transition);">
+      <span style="font-size:18px;">🎓</span>
+      <span style="font-size:12.5px;font-weight:600;">${m.name}</span>
+    </div>`).join('');
+  S.mencionIds.forEach(id=>{
+    const t=qs('[data-men-id="'+id+'"]');
+    if(t){t.style.borderColor='var(--red)';t.style.background='var(--red-bg)';}
+  });
+}
+function selectMencion(id,el){
+  const i=S.mencionIds.indexOf(id);
+  if(i>=0){S.mencionIds.splice(i,1);el.style.borderColor='var(--gray-200)';el.style.background='var(--white)';}
+  else{S.mencionIds.push(id);el.style.borderColor='var(--red)';el.style.background='var(--red-bg)';}
+}
+
+// Coursera multi-select
+function buildCourseraList(){
+  const list=qs('#coursera-list');if(!list)return;
+  list.innerHTML=COURSERA_COURSES_DATA.map(c=>`
+    <div class="coursera-tile ${S.courseraIds.includes(c.id)?'selected':''}" data-crs-id="${c.id}">
+      <span style="font-size:22px;flex-shrink:0;">${c.icon}</span>
+      <div style="flex:1;">
+        <div class="ct-name">${c.name}</div>
+        <div class="ct-credits">${c.credits} créditos · Virtual · Domingo</div>
+        <div style="font-size:10.5px;color:var(--gray-500);margin-top:3px;line-height:1.4;">${c.desc}</div>
+      </div>
+      <div class="ct-check" id="crs-check-${c.id}">${S.courseraIds.includes(c.id)?'✓':''}</div>
+      <span class="ct-virtual-badge">🟣 Virtual</span>
+    </div>`).join('');
+  updateCoursera();
+}
+function toggleCourseraItem(id){
+  const course=COURSERA_COURSES_DATA.find(c=>c.id===id);if(!course)return;
+  const i=S.courseraIds.indexOf(id);
+  if(i>=0){
+    S.courseraIds.splice(i,1);
+  } else {
+    const total=getTotalCredits();
+    if(total+course.credits>MAX_CREDITS){openCreditModal(id,true);return;}
+    S.courseraIds.push(id);
+  }
+  // refresh UI
+  qsa('.coursera-tile').forEach(t=>{
+    const tid=t.dataset.crsId;
+    const sel=S.courseraIds.includes(tid);
+    t.classList.toggle('selected',sel);
+    const ch=qs('#crs-check-'+tid);if(ch)ch.textContent=sel?'✓':'';
+  });
+  updateCoursera();
+  if(S.schedule)liveRecalc();
+}
+function updateCoursera(){
+  const total=S.courseraIds.reduce((a,id)=>{const c=COURSERA_COURSES_DATA.find(x=>x.id===id);return a+(c?c.credits:0);},0);
+  const el=qs('#coursera-multi-total');
+  if(el){
+    if(S.courseraIds.length>0){el.classList.add('visible');el.textContent=`Total Coursera: ${total} créditos (${S.courseraIds.length} curso${S.courseraIds.length!==1?'s':''})`;}  
+    else el.classList.remove('visible');
+  }
+}
+function showCourseraDesc(id){
+  const c=typeof COURSERA_COURSES!=='undefined'?COURSERA_COURSES.find(x=>x.id===id):null;
+  if(!c)return;
+  qs('#elec-desc-title').textContent=c.icon+' '+c.name;
+  qs('#elec-desc-body').textContent=c.description;
+  qs('#elec-desc-panel').style.display='block';
+  qs('#elec-desc-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CREDIT LIMIT MODAL
+// ═══════════════════════════════════════════════════════════════
+function openCreditModal(pendingId,isCoursera=false){
+  S._pendingAdd={id:pendingId,isCoursera};
+  S._swapTargets=[];
+  const course=isCoursera
+    ?COURSERA_COURSES_DATA.find(c=>c.id===pendingId)
+    :REGULAR_COURSES.find(c=>c.id===pendingId);
+  const total=getTotalCredits();
+  const need=course?course.credits-(MAX_CREDITS-total):0;
+  qs('#credit-modal-sub').textContent=
+    `Quieres agregar "${course?.name}" (${course?.credits} cr). Total actual: ${total}/${MAX_CREDITS}. Debes liberar al menos ${need} crédito(s).`;
+  const body=qs('#credit-modal-body');
+  const all=[...S.courses.map(id=>{const c=REGULAR_COURSES.find(x=>x.id===id);return{id,name:c?.name||id,credits:c?.credits||0,icon:c?.icon||'📚'};}),
+              ...S.courseraIds.map(id=>{const c=COURSERA_COURSES_DATA.find(x=>x.id===id);return{id,name:c?.name||id,credits:c?.credits||0,icon:c?.icon||'💻',isCrs:true};})];
+  body.innerHTML=all.map(c=>`
+    <div class="credit-swap-item" data-swap-id="${c.id}" data-crs="${c.isCrs||false}">
+      <div class="csw-check"></div>
+      <div class="csw-info">
+        <div class="csw-name">${c.icon} ${c.name}</div>
+        <div class="csw-credits">${c.credits} créditos</div>
+      </div>
+    </div>`).join('');
+  qs('#credit-modal-overlay').classList.add('open');
+}
+function closeCreditModal(){
+  qs('#credit-modal-overlay').classList.remove('open');
+  S._pendingAdd=null;S._swapTargets=[];
+}
+function applyCredit(){
+  if(S._swapTargets.length===0){toast('Selecciona al menos un curso a eliminar','⚠️');return;}
+  const pending=S._pendingAdd;
+  const pendingCourse=pending.isCoursera
+    ?COURSERA_COURSES_DATA.find(c=>c.id===pending.id)
+    :REGULAR_COURSES.find(c=>c.id===pending.id);
+  const freed=S._swapTargets.reduce((a,{id,isCrs})=>{
+    const c=isCrs?COURSERA_COURSES_DATA.find(x=>x.id===id):REGULAR_COURSES.find(x=>x.id===id);
+    return a+(c?c.credits:0);
+  },0);
+  const newTotal=getTotalCredits()-freed+(pendingCourse?.credits||0);
+  if(newTotal>MAX_CREDITS){toast(`Necesitas liberar ${newTotal-MAX_CREDITS} crédito(s) más','⚠️`);return;}
+  S._swapTargets.forEach(({id,isCrs})=>{
+    if(isCrs){const i=S.courseraIds.indexOf(id);if(i>=0)S.courseraIds.splice(i,1);}
+    else{const i=S.courses.indexOf(id);if(i>=0)S.courses.splice(i,1);}
+  });
+  if(pending.isCoursera)S.courseraIds.push(pending.id);
+  else{S.courses.push(pending.id);}
+  closeCreditModal();
+  refreshCourseGridUI();
+  updateCourseCount();
+  buildCourseraList();
+  toast(`"${pendingCourse?.name}" agregado. Horario recalculado.`,'✅');
+  if(S.schedule)liveRecalc();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SCHEDULING ENGINE
+// ═══════════════════════════════════════════════════════════════
+function getActiveBlocks(){
+  let blocks=[];
+  const turnos=S.turnos.length?S.turnos:['mañana'];
+  turnos.forEach(t=>{(TURNO_BLOCKS[t]||[]).forEach(b=>{if(!blocks.includes(b))blocks.push(b);});});
+  blocks.sort();
+  if(S.avoidMorning)blocks=blocks.filter(b=>parseInt(b)>=12);
+  if(S.workBlockedHours&&S.workBlockedHours.length){
+    blocks=blocks.filter(b=>{
+      const bh=parseInt(b);
+      return !S.workBlockedHours.some(wh=>{
+        const[ws,we]=wh.split('-').map(Number);return bh>=ws&&bh<we;
+      });
+    });
+  }
+  return blocks;
+}
+function findBlock(occ,blocks,dur,gap=0){
+  for(let i=0;i<=blocks.length-dur;i++){
+    let ok=true;
+    for(let d=0;d<dur;d++)if(occ.has(i+d)){ok=false;break;}
+    if(!ok)continue;
+    if(gap>0){let gok=true;for(let g=0;g<gap;g++)if(occ.has(i+dur+g)){gok=false;break;}if(!gok)continue;}
+    return i;
+  }
+  return -1;
+}
+function getProfessor(id){
+  const c=REGULAR_COURSES.find(x=>x.id===id);if(!c)return 'Por asignar';
+  const p=PROFESSORS.find(x=>x.course===c.name);
+  return p?p.name.split(' ').slice(-1)[0]:'Por asignar';
+}
+
+function runEngine(){
+  if(S.turnos.length===0&&!S.schedule)return{error:'Selecciona al menos un turno.'};
+  const allIds=[...S.courses,...S.courseraIds];
+  if(allIds.length===0)return{error:'Selecciona al menos un curso.'};
+
+  const blocks=getActiveBlocks();
+  if(blocks.length===0)return{error:'No hay bloques disponibles con los turnos y restricciones actuales.'};
+
+  const availDays=DAYS_ALL.filter(d=>!S.freeDays.includes(d));
+  if(availDays.length===0)return{error:'No hay días disponibles. Reduce los días libres.'};
+
+  const load=S.load||'media';
+  const gap=S.wantGaps?S.gapHours:0;
+  const occ={};  // day -> Set of block indices
+  DAYS_ALL.forEach(d=>occ[d]=new Set());
+  occ['Dom']=new Set();
+
+  const assignments=[];
+  const colorIdx={};allIds.forEach((id,i)=>colorIdx[id]=i%COLOR_CLASSES.length);
+
+  // ── Coursera → Sunday ──
+  let sunSlot=0;
+  for(const id of S.courseraIds){
+    const c=COURSERA_COURSES_DATA.find(x=>x.id===id);if(!c)continue;
+    const blk=COURSERA_SUN_SLOTS[sunSlot%COURSERA_SUN_SLOTS.length];
+    assignments.push({id,name:c.name,icon:c.icon,credits:c.credits,
+      day:'Dom',start:blk,end:incH(blk,c.duration),
+      colorClass:COURSERA_COLOR,prof:'Coursera',virtual:true,
+      startH:FULL_HOURS.indexOf(blk),spanH:c.duration});
+    sunSlot+=c.duration+(gap?gap:0);
+  }
+
+  // ── English → interdiario (same time, 3 days) ──
+  const englishIds=S.courses.filter(id=>REGULAR_COURSES.find(c=>c.id===id&&c.isEnglish));
+  for(const id of englishIds){
+    const c=REGULAR_COURSES.find(x=>x.id===id);
+    let pat=ENGLISH_PATTERNS.find(p=>p.days.every(d=>!S.freeDays.includes(d)&&availDays.includes(d)));
+    if(!pat)pat=ENGLISH_PATTERNS.slice().sort((a,b)=>
+      a.days.filter(d=>S.freeDays.includes(d)).length-b.days.filter(d=>S.freeDays.includes(d)).length)[0];
+    let bi=null;
+    for(let i=0;i<=blocks.length-c.duration;i++){
+      let ok=true;
+      for(const day of pat.days){
+        if(!occ[day])occ[day]=new Set();
+        for(let d=0;d<c.duration;d++)if(occ[day].has(i+d)){ok=false;break;}
+        if(!ok)break;
+      }
+      if(ok){bi=i;break;}
+    }
+    if(bi===null)return{error:`No se pudo asignar "${c.name}" en patrón interdiario. Ajusta tus días libres o turno.`};
+    const st=blocks[bi];const en=incH(st,c.duration);
+    for(const day of pat.days){
+      for(let d=0;d<c.duration;d++)occ[day].add(bi+d);
+      if(gap)for(let g=0;g<gap;g++)occ[day].add(bi+c.duration+g);
+      assignments.push({id,name:c.name,icon:c.icon,credits:c.credits,
+        day,start:st,end:en,colorClass:COLOR_CLASSES[colorIdx[id]%COLOR_CLASSES.length],
+        prof:getProfessor(id),interdiario:true,pattern:pat.label,
+        startH:FULL_HOURS.indexOf(st),spanH:c.duration});
+    }
+    pat.days.forEach(d=>{if(!availDays.includes(d))availDays.push(d);});
+  }
+
+  // ── Regular courses → week distribution ──
+  const regularIds=S.courses.filter(id=>!REGULAR_COURSES.find(c=>c.id===id&&c.isEnglish));
+  const dayPool=[...availDays];
+
+  for(const id of regularIds){
+    const c=REGULAR_COURSES.find(x=>x.id===id);
+    let placed=0;const used=new Set();
+    for(let att=0;att<80&&placed<2;att++){
+      let day;
+      if(load==='alta'){day=[...dayPool].sort((a,b)=>occ[b].size-occ[a].size)[placed%dayPool.length];}
+      else if(load==='ligera'){day=[...dayPool].sort((a,b)=>occ[a].size-occ[b].size)[placed%dayPool.length];}
+      else{day=dayPool[(assignments.filter(a=>!a.virtual&&!a.interdiario).length+placed)%dayPool.length];}
+      if(used.has(day)){const o=dayPool.filter(d=>!used.has(d));if(o.length){day=o[0];}}
+      if(!occ[day])occ[day]=new Set();
+      let bi=findBlock(occ[day],blocks,c.duration,gap);
+      if(bi===-1){
+        const oth=[...dayPool].filter(d=>d!==day).sort((a,b)=>occ[a].size-occ[b].size);
+        for(const td of oth){bi=findBlock(occ[td],blocks,c.duration,gap);if(bi!==-1){day=td;break;}}
+      }
+      if(bi===-1)return{error:`No se pudo asignar "${c.name}". Reduce días libres, ajusta el turno o baja la carga.`};
+      const st=blocks[bi];const en=incH(st,c.duration);
+      for(let d=0;d<c.duration;d++)occ[day].add(bi+d);
+      if(gap)for(let g=0;g<gap;g++)occ[day].add(bi+c.duration+g);
+      used.add(day);
+      assignments.push({id,name:c.name,icon:c.icon,credits:c.credits,
+        day,start:st,end:en,colorClass:COLOR_CLASSES[colorIdx[id]%COLOR_CLASSES.length],
+        prof:getProfessor(id),startH:FULL_HOURS.indexOf(st),spanH:c.duration});
+      placed++;
+    }
+    if(placed<2)return{error:`No se pudo completar la asignación de "${c.name}".`};
+  }
+  return{assignments};
+}
+
+function scoreEngine(assignments){
+  let score=100;
+  const blocks=getActiveBlocks();
+  const reg=assignments.filter(a=>!a.virtual);
+  for(const a of reg){if(!blocks.includes(a.start))score-=12;}
+  for(const a of reg){if(S.freeDays.includes(a.day))score-=20;}
+  if(S.avoidMorning)for(const a of reg){if(parseInt(a.start)<12)score-=8;}
+  const days=new Set(reg.map(a=>a.day)).size;
+  if(S.load==='ligera'&&days>=4)score+=5;
+  if(S.load==='alta'&&days<=3)score+=5;
+  if(S.load==='media'&&days>=3&&days<=4)score+=3;
+  for(const a of assignments.filter(a=>a.virtual)){if(a.day!=='Dom')score-=20;}
+  return Math.max(0,Math.min(100,score));
+}
+
+function explainEngine(assignments){
+  const parts=[];
+  const tL=S.turnos.map(t=>({mañana:'mañana',tarde:'tarde',noche:'noche'}[t]||t));
+  const days=new Set(assignments.filter(a=>!a.virtual).map(a=>a.day)).size;
+  parts.push(`Clases asignadas en turno ${tL.join(' + ')||'—'}.`);
+  if(S.freeDays.length)parts.push(`Días libres: ${S.freeDays.join(', ')}.`);
+  if(S.avoidMorning)parts.push('Bloques anteriores a las 12:00 evitados.');
+  if(S.wantGaps)parts.push(`${S.gapHours}h de hueco entre clases.`);
+  if(S.load==='alta')parts.push(`Carga alta: ${days} días usados.`);
+  if(S.load==='ligera')parts.push(`Carga ligera: distribuidas en ${days} días.`);
+  const crs=assignments.filter(a=>a.virtual);
+  if(crs.length)parts.push(`${crs.length} Coursera el domingo (virtual).`);
+  const eng=assignments.filter(a=>a.interdiario);
+  if(eng.length)parts.push(`Inglés interdiario ${eng[0].pattern}.`);
+  return parts.join(' ');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GENERATE (with animation)
+// ═══════════════════════════════════════════════════════════════
+function doGenerate(){
+  S.avoidMorning=qs('#tog-avoidmorn').classList.contains('on');
+  S.wantGaps=qs('#tog-gaps').classList.contains('on');
+  S.gapHours=parseInt(qs('#gap-val').textContent||'1');
+  S.workActivities=qs('#tog-work').classList.contains('on');
+  if(!S.load)S.load='media';
+
+  if(S.turnos.length===0){toast('Selecciona al menos un turno','⚠️');return;}
+  const allIds=[...S.courses,...S.courseraIds];
+  if(allIds.length===0){toast('Selecciona al menos un curso','⚠️');return;}
+
+  qs('#error-card').classList.remove('show');
+  const curEl=qs('#step-'+wizardStep);if(curEl)curEl.classList.remove('active');
+  qs('#step-gen').classList.add('active');
+
+  const steps=['gs-0','gs-1','gs-2','gs-3','gs-4','gs-5'];
+  const bar=qs('#gen-bar-fill');
+  steps.forEach((id,i)=>{
+    setTimeout(()=>{qs('#'+id).classList.add('active');if(bar)bar.style.width=((i+1)/steps.length*100)+'%';},i*380);
+    setTimeout(()=>{const el=qs('#'+id);el.classList.remove('active');el.classList.add('done');qs('.gen-step-icon',el).textContent='✅';},i*380+340);
+  });
+  setTimeout(()=>{
+    const r=runEngine();
+    if(r.error){
+      qs('#step-gen').classList.remove('active');gotoStep(4);
+      qs('#error-card').classList.add('show');qs('#error-msg').textContent=r.error;
+      steps.forEach(id=>{const e=qs('#'+id);e.classList.remove('active','done');qs('.gen-step-icon',e).textContent='⏳';});
+      if(bar)bar.style.width='0';return;
+    }
+    S.schedule=r.assignments;S.score=scoreEngine(r.assignments);
+    renderSchedule();
+    qs('#step-gen').classList.remove('active');
+    qs('#step-carga-done').classList.add('active');
+    toast('¡Horario generado! Puntuación: '+S.score+'/100 🎉','✅');
+    steps.forEach(id=>{const e=qs('#'+id);e.classList.remove('active','done');qs('.gen-step-icon',e).textContent='⏳';});
+    if(bar)bar.style.width='0';
+  },steps.length*380+160);
+}
+
+// Live recalculation (no animation)
+function liveRecalc(){
+  if(!S.schedule)return;
+  S.avoidMorning=qs('#tog-avoidmorn')?.classList.contains('on')||false;
+  S.wantGaps=qs('#tog-gaps')?.classList.contains('on')||false;
+  S.gapHours=parseInt(qs('#gap-val')?.textContent||'1');
+  if(S.turnos.length===0)return;
+  const r=runEngine();
+  if(r.error){toast('⚠️ '+r.error,'⚠️');return;}
+  S.schedule=r.assignments;S.score=scoreEngine(r.assignments);
+  renderSchedule();
+  toast('Horario actualizado ✓','✅');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER SCHEDULE — FULL DAY GRID 06:00-23:00
+// ═══════════════════════════════════════════════════════════════
+function renderSchedule(){
+  if(!S.schedule)return;
+  const A=S.schedule;
+  const hasSun=A.some(a=>a.day==='Dom');
+  const hasSat=A.some(a=>a.day==='Sáb');
+
+  // Score
+  const pct=S.score/100;const circ=125.66;
+  const arc=qs('#score-circle-arc');
+  if(arc){arc.style.strokeDashoffset=circ-pct*circ;arc.style.stroke=S.score>=80?'#10B981':S.score>=60?'#F59E0B':'#EF4444';}
+  qs('#score-display').textContent=S.score+'/100';
+  qs('#score-display').style.color=S.score>=80?'#10B981':S.score>=60?'#F59E0B':'#EF4444';
+
+  const nc=[...S.courses,...S.courseraIds].length;
+  const tL=S.turnos.map(t=>({mañana:'Mañana',tarde:'Tarde',noche:'Noche'}[t]||t)).join('+');
+  qs('#sched-subtitle').textContent=`Semestre 2025-I · ${nc} cursos · Turno ${tL}`;
+
+  // Sunday note
+  qs('#sunday-note').classList.toggle('visible',hasSun);
+
+  // Columns
+  let cols=['Lun','Mar','Mié','Jue','Vie'];
+  if(hasSat)cols.push('Sáb');
+  if(hasSun)cols.push('Dom');
+
+  // Active blocks for highlighting
+  const activeBlocks=getActiveBlocks();
+
+  // Build grid HTML
+  const gridEl=qs('#week-grid-full');gridEl.innerHTML='';
+
+  // Head
+  const head=document.createElement('div');head.className='wg-full-head';
+  const th=document.createElement('div');th.className='wg-full-time-header';th.textContent='Hora';head.appendChild(th);
+  cols.forEach(d=>{const dh=document.createElement('div');dh.className='wg-full-day-header'+(d==='Dom'?' sunday-header':'');dh.textContent=DAY_LABEL[d]||d;head.appendChild(dh);});
+  gridEl.appendChild(head);
+
+  // Body
+  const body=document.createElement('div');body.className='wg-full-body';
+  // Time col
+  const tc=document.createElement('div');tc.className='wg-full-time-col';
+  FULL_HOURS.forEach(h=>{
+    const cell=document.createElement('div');cell.className='wg-full-time-cell'+(activeBlocks.includes(h)?' in-turno':'');
+    cell.textContent=h;cell.style.height=CELL_H+'px';tc.appendChild(cell);
+  });
+  body.appendChild(tc);
+
+  // Day cols
+  const dayColMap={};
+  cols.forEach(d=>{
+    const col=document.createElement('div');col.className='wg-full-day-col'+(d==='Dom'?' sunday-col':'');
+    col.style.minHeight=(FULL_HOURS.length*CELL_H)+'px';
+    FULL_HOURS.forEach((h,hi)=>{
+      const cell=document.createElement('div');
+      let cls='wg-full-cell';
+      if(d!=='Dom'&&activeBlocks.includes(h))cls+=' in-turno';
+      // Mark gap slots: slot immediately after each course block
+      cell.className=cls;cell.style.height=CELL_H+'px';col.appendChild(cell);
+    });
+    body.appendChild(col);dayColMap[d]=col;
+  });
+
+  // Place course blocks
+  A.forEach(a=>{
+    const col=dayColMap[a.day];if(!col)return;
+    const rowIdx=FULL_HOURS.indexOf(a.start);if(rowIdx<0)return;
+    const rowEnd=FULL_HOURS.indexOf(a.end);
+    const span=rowEnd>=0?rowEnd-rowIdx:a.spanH||1;
+    const top=rowIdx*CELL_H+2;const height=span*CELL_H-5;
+    const block=document.createElement('div');
+    block.className='course-block-full '+a.colorClass;
+    if(a.virtual){block.style.cssText='background:#EDE9FE;color:#5B21B6;border-left:3px solid #8B5CF6;';}
+    block.style.top=top+'px';block.style.height=Math.max(height,24)+'px';
+    const rmBtn=document.createElement('button');rmBtn.className='cb-remove-btn';rmBtn.innerHTML='✕';
+    rmBtn.title='Quitar curso';rmBtn.addEventListener('click',e=>{e.stopPropagation();removeCourse(a.id,a.virtual);});
+    let extraTag='';
+    if(a.virtual)extraTag='<span class="cb-tag cb-tag-virtual">🟣 Virtual·Dom</span>';
+    else if(a.interdiario)extraTag='<span class="cb-tag" style="background:rgba(20,184,166,.2);color:#0d9488;">↔ Interdiario</span>';
+    block.innerHTML=`<div class="cb-fn">${a.icon||''} ${a.name}</div><div class="cb-ft">${a.start}–${a.end}</div><div class="cb-fp">${a.prof}</div>${extraTag}`;
+    block.appendChild(rmBtn);
+    block.addEventListener('click',()=>openCourseModal(a));
+    col.appendChild(block);
+    // If gap requested, shade gap cells
+    if(S.wantGaps&&!a.virtual&&rowEnd>=0){
+      for(let g=0;g<S.gapHours;g++){
+        const gIdx=rowEnd+g;if(gIdx<FULL_HOURS.length){
+          const cells=qsa('.wg-full-cell',col);if(cells[gIdx])cells[gIdx].classList.add('gap-slot');
+        }
+      }
+    }
+  });
+  gridEl.appendChild(body);
+
+  // ── Summary panel ──
+  const total=getTotalCredits();
+  const daysUsed=new Set(A.filter(a=>!a.virtual).map(a=>a.day)).size;
+  qs('#stats-row').innerHTML=`
+    <div class="stat-mini"><div class="val">${nc}</div><div class="lbl">Cursos</div></div>
+    <div class="stat-mini"><div class="val">${total}</div><div class="lbl">Créditos</div></div>
+    <div class="stat-mini"><div class="val">${daysUsed}</div><div class="lbl">Días/sem</div></div>
+    <div class="stat-mini"><div class="val">${A.length}</div><div class="lbl">Sesiones</div></div>`;
+  qs('#explanation-text').textContent=explainEngine(A);
+  const tL2=S.turnos.map(t=>({mañana:'Mañana',tarde:'Tarde',noche:'Noche'}[t]||t));
+  const tags=[...tL2.map(t=>({l:'Turno '+t,bg:'#EFF6FF',tc:'#1D4ED8'})),
+    {l:'Carga '+(S.load||'media'),bg:'#F0FDF4',tc:'#15803D'},
+    ...(S.freeDays.length?[{l:S.freeDays.length+' libre(s)',bg:'#FFFBEB',tc:'#92400E'}]:[]),
+    ...(S.wantGaps?[{l:'Hueco '+S.gapHours+'h',bg:'#F5F3FF',tc:'#6D28D9'}]:[]),
+    ...(A.some(a=>a.virtual)?[{l:'Coursera·Dom',bg:'#EDE9FE',tc:'#7C3AED'}]:[]),
+    ...(A.some(a=>a.interdiario)?[{l:'Inglés interdiario',bg:'#F0FDFA',tc:'#0d9488'}]:[]),
+  ];
+  qs('#explanation-tags').innerHTML=tags.map(t=>`<span class="explanation-tag" style="background:${t.bg};color:${t.tc}">${t.l}</span>`).join('');
+
+  // Course list with remove buttons
+  const seen=new Set();
+  qs('#course-summary-list').innerHTML=A.filter(a=>{if(seen.has(a.id))return false;seen.add(a.id);return true;}).map(a=>`
+    <div class="course-summary-item">
+      <div class="cs-dot" style="background:${getDotColor(a.colorClass)};flex-shrink:0;width:10px;height:10px;border-radius:50%;"></div>
+      <div class="cs-info" style="flex:1;cursor:pointer;">
+        <div class="cs-name">${a.icon||''} ${a.name}${a.virtual?'<span style="font-size:9.5px;color:var(--purple);margin-left:4px;">🟣</span>':''}</div>
+        <div class="cs-slot">${getCourseDays(a.id)}</div>
+      </div>
+      <button style="background:var(--red-bg);color:var(--red);border:none;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;"
+        data-remove-id="${a.id}" data-remove-virt="${a.virtual||false}">✕</button>
+    </div>`).join('');
+
+  // Edit bar
+  const pill=qs('#live-credit-pill');
+  if(pill){pill.textContent=total+' / '+MAX_CREDITS+' cr';pill.className='sched-credit-pill'+(total>=MAX_CREDITS?' full':total>=MAX_CREDITS-5?' warn':'');}
+  qs('#sched-edit-bar').classList.add('visible');
+  qs('#no-schedule-msg').style.display='none';
+  qs('#schedule-content').style.display='block';
+}
+
+function getDotColor(cc){
+  return({'color-0':'#3B82F6','color-1':'#EC4899','color-2':'#10B981','color-3':'#F59E0B','color-4':'#8B5CF6','color-5':'#F97316'})[cc]||'#6B7280';
+}
+function getCourseDays(id){
+  if(!S.schedule)return'';
+  return S.schedule.filter(a=>a.id===id).map(a=>`${DAY_LABEL[a.day]||a.day} ${a.start}–${a.end}`).join(' · ');
+}
+
+// Remove course from schedule live
+function removeCourse(id,isVirtual){
+  if(isVirtual){const i=S.courseraIds.indexOf(id);if(i>=0)S.courseraIds.splice(i,1);}
+  else{const i=S.courses.indexOf(id);if(i>=0)S.courses.splice(i,1);}
+  refreshCourseGridUI();updateCourseCount();
+  const all=[...S.courses,...S.courseraIds];
+  if(all.length===0){
+    S.schedule=null;
+    qs('#schedule-content').style.display='none';
+    qs('#no-schedule-msg').style.display='';
+    qs('#sched-edit-bar').classList.remove('visible');
+    return;
+  }
+  liveRecalc();
+  toast('Curso eliminado y horario recalculado','✅');
+}
+
+// Add course modal
+function openAddCourseModal(){
+  const total=getTotalCredits();
+  qs('#add-modal-credit-bar').textContent=`Créditos actuales: ${total} / ${MAX_CREDITS}`;
+  const all=[...REGULAR_COURSES,...COURSERA_COURSES_DATA];
+  qs('#add-course-grid').innerHTML=all.map(c=>{
+    const inReg=S.courses.includes(c.id);const inCrs=S.courseraIds.includes(c.id);
+    const already=inReg||inCrs;const exceed=!already&&total+c.credits>MAX_CREDITS;
+    return `<div class="add-tile ${already||exceed?'add-tile-disabled':''}"
+      data-add-id="${c.id}" data-add-crs="${!!c.duration&&c.id.startsWith('crs_')}">
+      <span style="font-size:18px;">${c.icon}</span>
+      <div><div class="add-tile-name">${c.name}</div>
+      <div class="add-tile-cr">${c.credits}cr${already?' · Ya seleccionado':exceed?' · Excede límite':''}</div></div>
+    </div>`;
+  }).join('');
+  qs('#modal-add-course').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  COURSE MODAL (alternatives)
+// ═══════════════════════════════════════════════════════════════
+function openCourseModal(a){
+  const blocks=getActiveBlocks();
+  const avail=DAYS_ALL.filter(d=>!S.freeDays.includes(d));
+  let alts=[];
+  for(let i=0;i<3;i++){
+    const d=avail[i%avail.length];const b=blocks[i%blocks.length];
+    if(d&&b)alts.push({sec:String.fromCharCode(66+i),day:d,start:b,end:incH(b,1),
+      prof:PROFESSORS.find(p=>p.course===a.name)?.name||'Por asignar'});
+  }
+  qs('#modal-course-title').textContent=(a.icon||'')+' '+a.name+' – Secciones alternativas';
+  qs('#modal-course-body').innerHTML=`
+    <p style="font-size:12px;color:var(--gray-500);margin-bottom:14px;">Secciones respetando turno <strong>${S.turnos.join('+')||'—'}</strong>.</p>
+    ${alts.map((alt,i)=>`<div class="alt-section-item ${i===0?'selected':''}" data-alt-idx="${i}">
+      <div class="alt-s-name">Sección ${alt.sec} · ${DAY_LABEL[alt.day]||alt.day}</div>
+      <div class="alt-s-detail">${alt.start}–${alt.end} · ${alt.prof}</div></div>`).join('')}
+    <button class="btn btn-primary" id="confirm-alt-btn" style="width:100%;margin-top:8px;">Aplicar sección →</button>`;
+  qs('#modal-course').classList.add('open');
+}
+
+function closeModal(id,e){if(e.target===qs('#'+id))qs('#'+id).classList.remove('open');}
+
+// ═══════════════════════════════════════════════════════════════
+//  PROFESSORS
+// ═══════════════════════════════════════════════════════════════
+function buildProfGrid(){
+  const grid=qs('#prof-grid');if(!grid)return;
+  grid.innerHTML=PROFESSORS.map(p=>{
+    const stars=Array.from({length:5},(_,i)=>`<span class="star ${i<Math.floor(p.rating)?'filled':'empty'}">★</span>`).join('');
+    const tags=p.tags.map(t=>`<span class="prof-tag ${t==='Mejor valorado'?'best':t==='Nueva'?'new':''}">${t}</span>`).join('');
+    return `<div class="prof-card"><div class="prof-header"><div class="prof-ava" style="background:${p.color}">${p.avatar}</div>
+      <div class="prof-info"><div class="prof-name">${p.name}</div><div class="prof-course">${p.course}</div>
+      <div class="stars">${stars}<span class="rating-num">${p.rating}</span></div></div></div>
+      <div class="prof-tags">${tags}</div>
+      <div class="prof-stat"><span>📝 ${p.reviews} reseñas</span><span>🏫 ${p.exp}</span></div></div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PROGRESS
+// ═══════════════════════════════════════════════════════════════
+function buildProgress(){
+  const grid=qs('#ciclos-grid');if(!grid)return;
+  const data=[{n:1,done:true},{n:2,done:true},{n:3,done:true},{n:4,done:true},{n:5,done:true},
+    {n:6,done:true},{n:7,done:true},{n:8,current:true},{n:9},{n:10}];
+  grid.innerHTML=data.map(c=>`<div class="ciclo-card ${c.done?'done':c.current?'current':''}">
+    <div class="ciclo-num">Ciclo ${c.n}</div>
+    <div class="ciclo-label">${c.done?'Completado':c.current?'Actual':'Pendiente'}</div>
+    <div class="ciclo-dot"></div></div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  WAITLIST
+// ═══════════════════════════════════════════════════════════════
+let wlPos1=3,wlPos2=7;
+function advanceWaitlist(){
+  if(wlPos1<=0&&wlPos2<=0){toast('¡Ya tienes todos los cupos! 🎉','🎉');return;}
+  if(wlPos1>0){
+    wlPos1--;
+    qs('#wl-p1').textContent=wlPos1;qs('#wl-pos-num').textContent=wlPos1;
+    if(wlPos1===0){
+      const ch=qs('#wl-chip-1');if(ch){ch.textContent='¡Cupo asignado!';ch.classList.add('green');}
+      addAlert({icon:'🎉',title:'¡Cupo disponible! Marketing Avanzado',sub:'Sec. 02 · Ya puedes matricularte.',time:'Ahora',type:'success'});
+      toast('¡Cupo disponible! 🎉','🎉');
+    } else toast('Posición: '+wlPos1+' en Marketing Avanzado','📊');
+  }
+  updateWlQueue();
+}
+function updateWlQueue(){
+  const icons=qsa('#wl-queue .wl-person:not(.you)');
+  const hide=3-wlPos1;icons.forEach((p,i)=>{if(i<hide)p.classList.add('gone');});
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ALERTS
+// ═══════════════════════════════════════════════════════════════
+const ALERTS=[
+  {icon:'📅',title:'Período de matrícula abierto',sub:'El proceso 2025-I está activo hasta el 28 de enero.',time:'Hace 2h',type:'unread'},
+  {icon:'🔔',title:'Posición en lista actualizada',sub:'Marketing Avanzado Sec. 02 · Posición #3.',time:'Hace 5h',type:'unread'},
+  {icon:'📋',title:'Solicitud enviada',sub:'Tu solicitud para Finanzas Corporativas fue recibida.',time:'Ayer',type:''},
+];
+function buildAlerts(){
+  const list=qs('#alerts-list');if(!list)return;
+  list.innerHTML=ALERTS.map(a=>`<div class="alert-item ${a.type}">
+    <div class="alert-icon">${a.icon}</div>
+    <div class="alert-body"><div class="alert-title">${a.title}</div><div class="alert-sub">${a.sub}</div></div>
+    <div class="alert-time">${a.time}</div>
+    ${a.type==='unread'?'<div class="unread-dot"></div>':''}
+    </div>`).join('');
+  const cnt=ALERTS.filter(a=>a.type==='unread'||a.type==='success').length;
+  qs('#alerts-badge').textContent=cnt;
+  const nd=qs('#topbar-notif-dot');if(nd)nd.style.display=cnt?'block':'none';
+}
+function addAlert(a){ALERTS.unshift(a);buildAlerts();}
+function markAllRead(){ALERTS.forEach(a=>{if(a.type==='unread')a.type='';});buildAlerts();toast('Marcadas como leídas','✅');}
+function submitRequest(){addAlert({icon:'📋',title:'Solicitud enviada',sub:'Tu solicitud fue recibida.',time:'Ahora',type:'unread'});toast('Solicitud enviada 📋','✅');showPanel('alerts');}
+
+// ═══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+const PANEL_LABELS={wizard:'Generar Horario',schedule:'Mi Horario',professors:'Docentes',
+  progress:'Progreso Académico',waitlist:'Lista de Espera',alerts:'Notificaciones',request:'Solicitar Sección'};
+function showPanel(name){
+  qsa('.panel').forEach(p=>p.classList.remove('active'));
+  qsa('.nav-item').forEach(n=>n.classList.remove('active'));
+  const p=qs('#panel-'+name);if(p)p.classList.add('active');
+  const n=qs('#nav-'+name);if(n)n.classList.add('active');
+  const bc=qs('#breadcrumb-text');if(bc)bc.textContent=PANEL_LABELS[name]||name;
+  closeSidebar();
+  if(name==='progress'){setTimeout(()=>{
+    [{id:'pb1',w:'70%'},{id:'pb2',w:'70%'},{id:'pb3',w:'77%'},{id:'pb4',w:'30%'}].forEach(({id,w})=>{const el=qs('#'+id);if(el)el.style.width=w;});
+    const h=qs('#prog-bar-hero');if(h)h.style.width='70%';
+  },200);buildProgress();}
+  if(name==='waitlist'){setTimeout(()=>{const b=qs('#demand-bar');if(b)b.style.width='62%';},200);}
+  if(name==='schedule'&&S.schedule){renderSchedule();const rs=qs('#regen-strip');if(rs)rs.style.display='flex';}
+}
+function confirmEnrollment(){
+  addAlert({icon:'🎓',title:'Matrícula confirmada',sub:'Tu horario fue registrado para 2025-I.',time:'Ahora',type:'success'});
+  toast('¡Matrícula confirmada! 🎉','🎉');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT & EVENT WIRING
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  buildCourseGrid();
+  buildProfGrid();
+  buildAlerts();
+  updateWizardUI();
+  setTimeout(()=>{const b=qs('#req-demand-bar');if(b)b.style.width='62%';},800);
+
+  // Mobile sidebar
+  const mmb=qs('#mob-menu-btn');if(mmb)mmb.addEventListener('click',openSidebar);
+  const so=qs('#sidebar-overlay');if(so)so.addEventListener('click',closeSidebar);
+  // Nav items close sidebar on mobile
+  qsa('.nav-item').forEach(n=>n.addEventListener('click',closeSidebar));
+
+  // Course grid delegation
+  qs('#course-grid').addEventListener('click',e=>{
+    const tile=e.target.closest('[data-id]');if(tile)toggleCourse(tile.dataset.id);
+  });
+
+  // Coursera tiles delegation
+  document.addEventListener('click',e=>{
+    const ct=e.target.closest('.coursera-tile[data-crs-id]');
+    if(ct)toggleCourseraItem(ct.dataset.crsId);
+  });
+
+  // Mención tiles delegation
+  document.addEventListener('click',e=>{
+    const mt=e.target.closest('.mencion-tile[data-men-id]');
+    if(mt)selectMencion(mt.dataset.menId,mt);
+  });
+
+  // Alt section items
+  document.addEventListener('click',e=>{
+    const ai=e.target.closest('.alt-section-item');
+    if(ai){qsa('.alt-section-item').forEach(x=>x.classList.remove('selected'));ai.classList.add('selected');}
+    if(e.target.id==='confirm-alt-btn'){qs('#modal-course').classList.remove('open');toast('Sección actualizada ✓','✅');}
+  });
+
+  // Add course modal tiles
+  document.addEventListener('click',e=>{
+    const at=e.target.closest('.add-tile:not(.add-tile-disabled)');
+    if(at){
+      const id=at.dataset.addId;
+      const isCrs=at.dataset.addCrs==='true'||id.startsWith('crs_');
+      qs('#modal-add-course').classList.remove('open');
+      if(isCrs)toggleCourseraItem(id);else toggleCourse(id);
+    }
+  });
+  qs('#add-course-close')?.addEventListener('click',()=>qs('#modal-add-course').classList.remove('open'));
+  qs('#sched-add-btn')?.addEventListener('click',openAddCourseModal);
+
+  // modal-add-course backdrop
+  qs('#modal-add-course')?.addEventListener('click',e=>{if(e.target===qs('#modal-add-course'))qs('#modal-add-course').classList.remove('open');});
+
+  // Credit modal
+  qs('#credit-modal-cancel')?.addEventListener('click',closeCreditModal);
+  qs('#credit-modal-apply')?.addEventListener('click',applyCredit);
+  qs('#credit-modal-body')?.addEventListener('click',e=>{
+    const item=e.target.closest('.credit-swap-item');
+    if(!item)return;
+    const id=item.dataset.swapId;const isCrs=item.dataset.crs==='true';
+    const idx=S._swapTargets.findIndex(x=>x.id===id);
+    if(idx>=0){S._swapTargets.splice(idx,1);item.classList.remove('marked');}
+    else{S._swapTargets.push({id,isCrs});item.classList.add('marked');}
+  });
+
+  // Schedule summary remove buttons delegation
+  qs('#course-summary-list')?.addEventListener('click',e=>{
+    const rb=e.target.closest('[data-remove-id]');
+    if(rb)removeCourse(rb.dataset.removeId,rb.dataset.removeVirt==='true');
+  });
+
+  // Gap toggle
+  qs('#tog-gaps')?.addEventListener('click',function(){
+    this.classList.toggle('on');S.wantGaps=this.classList.contains('on');
+    qs('#gap-sub-panel').classList.toggle('visible',S.wantGaps);
+    if(S.schedule)liveRecalc();
+  });
+  qs('#gap-minus')?.addEventListener('click',()=>{
+    const el=qs('#gap-val');let v=Math.max(1,parseInt(el.textContent||'1')-1);el.textContent=v;S.gapHours=v;if(S.schedule)liveRecalc();
+  });
+  qs('#gap-plus')?.addEventListener('click',()=>{
+    const el=qs('#gap-val');let v=Math.min(4,parseInt(el.textContent||'1')+1);el.textContent=v;S.gapHours=v;if(S.schedule)liveRecalc();
+  });
+
+  // Work hours checkboxes
+  qsa('#work-hours-grid input').forEach(cb=>{cb.removeAttribute('onchange');cb.addEventListener('change',()=>updateWorkHours(cb));});
+
+  // Turno cards — remove inline onclick, wire via delegation
+  qsa('.turno-card').forEach(tc=>{
+    tc.removeAttribute('onclick');
+    tc.addEventListener('click',()=>{
+      const t=tc.querySelector('.tc-label').textContent.trim().toLowerCase();
+      const map={'mañana':'mañana','tarde':'tarde','noche':'noche'};
+      const key=Object.keys(map).find(k=>t.startsWith(k))||t;
+      pickTurno(key,tc);
+    });
+  });
+
+  // Free days — override inline onclick
+  qsa('.day-chip').forEach(chip=>{
+    chip.removeAttribute('onclick');
+    const day=({'Lunes':'Lun','Martes':'Mar','Miércoles':'Mié','Jueves':'Jue','Viernes':'Vie','Sábado':'Sáb'})[chip.textContent.trim()]||chip.textContent.trim();
+    chip.addEventListener('click',()=>toggleFreeDay(day,chip));
+  });
+
+  // Load cards
+  qsa('.load-card').forEach(lc=>{
+    lc.removeAttribute('onclick');
+    lc.addEventListener('click',()=>{
+      const l=lc.querySelector('.lc-label').textContent.trim().toLowerCase();
+      const map={'ligera':'ligera','media':'media','alta':'alta'};
+      pickLoad(map[l]||l,lc);
+    });
+  });
+
+  // generate schedule btn
+  qs('#step-4 .btn-primary')?.addEventListener('click',doGenerate);
+});
+
+// ════ ORIGINAL ELECTIVOS DATA ════
+const COURSERA_COURSES = [
+  {
+    id:'sql',
+    name:'ISC SQL básico para ciencia de datos',
+    icon:'🗄️',
+    description:'El curso ISC SQL básico para ciencia de datos está orientado a estudiantes que buscan desarrollar habilidades en consultas SQL. Este curso se compone de cuatro micro cursos donde los estudiantes desarrollarán proyectos SQL de complejidad progresiva, aplicando conceptos de ciencia de datos. Los temas que se cubrirán incluyen: Conceptos básicos de SQL (introducción a la sintaxis y estructura), Data Wrangling (técnicas para limpiar y preparar datos), Análisis de SQL (métodos para realizar análisis de datos), y Computación distribuida con Apache Spark y Delta Lake para manejar grandes volúmenes de datos.',
+  },
+  {
+    id:'ux',
+    name:'ISC Diseño de experiencia e interfaz del usuario',
+    icon:'🎨',
+    description:'El curso ISC Diseño de experiencia e interfaz del usuario brinda un enfoque centrado en el desarrollo de investigación para el diseño de interfaces digitales, orientadas al adecuado uso (UI) y experiencia (UX) de sus usuarios. Proporciona fundamentos para organizar y estructurar el correcto proceso de UX Design, incorporando criterios y ejercicios que brindan de manera efectiva y clara el uso de imágenes, formas, tipografías y colores aplicado al diseño de interfaces. El estudiante aprende de manera práctica procesos y conceptos alrededor del diseño web, desde la estrategia y arquitectura de la información, hasta la creación de prototipos digitales de alta fidelidad.',
+  },
+  {
+    id:'mktdig',
+    name:'ISC Analíticas de marketing digital',
+    icon:'📈',
+    description:'El curso ISC Analíticas de marketing digital permite entender la importancia que tienen las métricas en Marketing, haciendo un enlace entre lo tradicional y lo digital, con la intención de proporcionar las habilidades para desarrollar y editar sitios web para hacerlos más atractivos para los motores de búsqueda. De la misma manera, se enlaza la importancia de tener las redes sociales adecuadas, haciendo un match con la estrategia organizacional y entendiendo cómo usarlas y medirlas de manera óptima.',
+  },
+];
+
+const MENCIONES_DATA = [
+  {
+    id:'pub', name:'Creatividad Publicitaria',
+    cursos:[
+      {cod:'PU01', nombre:'Fundamentos de Publicidad', cred:3, req:'CM17 Introducción al Marketing'},
+      {cod:'PU159', nombre:'Estrategias Publicitarias', cred:3, req:'PU01 Fundamentos de Publicidad'},
+      {cod:'PU154', nombre:'Fundamentos de Creatividad Publicitaria', cred:3, req:'PU01 Fundamentos de Publicidad'},
+      {cod:'PU147', nombre:'Taller de Redacción Publicitaria', cred:3, req:'PU154'},
+      {cod:'PU146', nombre:'Estrategias Publicitarias 2', cred:3, req:'PU159'},
+    ]
+  },
+  {
+    id:'dep', name:'Marketing Deportivo',
+    cursos:[
+      {cod:'DT80', nombre:'Introducción al Sport Business', cred:3, req:'60 créditos aprobados'},
+      {cod:'DT81', nombre:'Producto Deportivo', cred:3, req:'80 créditos aprobados'},
+      {cod:'DT82', nombre:'Valor, Patrocinio y Ticketing en el Deporte', cred:3, req:'100 créditos aprobados'},
+      {cod:'DT83', nombre:'Branding y Comunicaciones en el Deporte', cred:3, req:'100 créditos aprobados'},
+      {cod:'DT84', nombre:'Taller de Marketing Deportivo Aplicado', cred:3, req:'120 créditos aprobados'},
+    ]
+  },
+  {
+    id:'psi', name:'Psicología',
+    cursos:[
+      {cod:'PS318', nombre:'Psicología de la Motivación', cred:3, req:'PU66 Comportamiento del Consumidor'},
+      {cod:'PS176', nombre:'Teorías de la Personalidad', cred:4, req:'PU66 Comportamiento del Consumidor'},
+      {cod:'PS98', nombre:'Pensamiento Positivo', cred:3, req:'PS176'},
+      {cod:'PS359', nombre:'Técnicas de Investigación y Cambio de Actitudes', cred:3, req:'160 créditos aprobados'},
+      {cod:'PS324', nombre:'Psicología Social', cred:3, req:'PS318'},
+    ]
+  },
+  {
+    id:'tur', name:'Turismo',
+    cursos:[
+      {cod:'TU48', nombre:'Introducción al Turismo', cred:3, req:'Sin requisitos'},
+      {cod:'TU51', nombre:'Empresas Turísticas', cred:3, req:'TU48'},
+      {cod:'TU47', nombre:'Turismo Sostenible', cred:3, req:'TU48'},
+      {cod:'TU56', nombre:'Desarrollo Turístico', cred:3, req:'TU47'},
+      {cod:'TU73', nombre:'Desarrollo de Destinos Turísticos', cred:3, req:'TU56'},
+    ]
+  },
+  {
+    id:'fot', name:'Fotografía',
+    cursos:[
+      {cod:'CO10', nombre:'Taller de Fotografía General', cred:3, req:'20 créditos aprobados'},
+      {cod:'CF03', nombre:'Iluminación I', cred:3, req:'CO10'},
+      {cod:'CF34', nombre:'Iluminación II', cred:3, req:'CF03'},
+      {cod:'CF08', nombre:'Taller de Fotografía de Paisajes', cred:3, req:'CF34'},
+      {cod:'PU61', nombre:'Fotografía Publicitaria', cred:3, req:'CF05 Iluminación II + 100 cr'},
+    ]
+  },
+  {
+    id:'emp', name:'Emprendimiento e Innovación Social',
+    cursos:[
+      {cod:'AD687', nombre:'Design Thinking', cred:3, req:'100 créditos aprobados'},
+      {cod:'AD688', nombre:'Emprendimiento de Negocios Sostenibles: Formulación', cred:3, req:'120 créditos aprobados'},
+      {cod:'AD689', nombre:'Emprendimiento de Negocios Sostenibles: Implementación', cred:4, req:'AD688'},
+      {cod:'PR279', nombre:'Innovación Social', cred:3, req:'160 créditos aprobados'},
+      {cod:'PR280', nombre:'Gestión de Proyectos Sociales', cred:3, req:'PR279'},
+    ]
+  },
+  {
+    id:'lid', name:'Gestión y Liderazgo',
+    cursos:[
+      {cod:'AH66', nombre:'Gestión del Talento', cred:3, req:'100 créditos aprobados'},
+      {cod:'AH67', nombre:'Liderazgo y Pensamiento Sistémico', cred:3, req:'100 créditos aprobados'},
+      {cod:'AD691', nombre:'Dirección Estratégica', cred:3, req:'120 créditos aprobados'},
+      {cod:'AD690', nombre:'Estrategias de Negociación', cred:3, req:'120 créditos aprobados'},
+      {cod:'AH53', nombre:'Coaching y Resolución de Conflictos', cred:3, req:'120 créditos aprobados'},
+    ]
+  },
+  {
+    id:'inn', name:'Innovación y Emprendimiento',
+    cursos:[
+      {cod:'AD185', nombre:'Intrapreneurship', cred:3, req:'100 créditos aprobados'},
+      {cod:'AD687', nombre:'Design Thinking', cred:3, req:'100 créditos aprobados'},
+      {cod:'AD688', nombre:'Emprendimiento de Negocios Sostenibles: Formulación', cred:3, req:'120 créditos aprobados'},
+      {cod:'AD690', nombre:'Estrategias de Negociación', cred:3, req:'120 créditos aprobados'},
+      {cod:'AD689', nombre:'Emprendimiento de Negocios Sostenibles: Implementación', cred:4, req:'AD688'},
+    ]
+  },
+  {
+    id:'pct', name:'Pensamiento Contemporáneo',
+    cursos:[
+      {cod:'HU661', nombre:'Modernidad y Post Modernidad', cred:3, req:'40 créditos aprobados'},
+      {cod:'HU637', nombre:'Tiranía y Totalitarismo', cred:3, req:'40 créditos aprobados'},
+      {cod:'HU663', nombre:'Estado, Poder y Conflicto Social', cred:3, req:'40 créditos aprobados'},
+      {cod:'HU664', nombre:'Arte y Cultura Contemporánea', cred:3, req:'40 créditos aprobados'},
+      {cod:'HU667', nombre:'Ideas Económicas', cred:3, req:'40 créditos aprobados'},
+    ]
+  },
+  {
+    id:'per', name:'Estudios Peruanistas',
+    cursos:[
+      {cod:'HU638', nombre:'Mundo Andino', cred:3, req:'40 créditos aprobados'},
+      {cod:'HU658', nombre:'República y Gobierno en el Perú del Siglo XX', cred:3, req:'40 créditos aprobados'},
+      {cod:'HU659', nombre:'Ideas Políticas en el Perú del Siglo XX', cred:3, req:'40 créditos aprobados'},
+      {cod:'HU660', nombre:'Grandes Libros Peruanos', cred:3, req:'40 créditos aprobados'},
+      {cod:'HU639', nombre:'Barroco Peruano', cred:3, req:'40 créditos aprobados'},
+    ]
+  },
+];
+</script>
+
+</body>
+</html>
